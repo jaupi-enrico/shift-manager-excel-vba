@@ -9,6 +9,8 @@ Sub AggiornaCodiceVBA()
     Dim NuovoCodice As String
     Dim Riga As String
     
+    ' Questa e' una prova
+
     ' Configura il modulo da aggiornare
     ModuloNome = "Module1" ' Nome del modulo VBA
     PercorsoFile = ThisWorkbook.Path & "\aggiornamento.txt" ' Percorso temporaneo
