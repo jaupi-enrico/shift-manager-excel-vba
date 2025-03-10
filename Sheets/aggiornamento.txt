@@ -10,11 +10,11 @@ Sub AggiornaCodiceVBA()
     Dim Riga As String
     
     ' Configura il modulo da aggiornare
-    ModuloNome = "Module1" ' Nome del modulo VBA
+    ModuloNome = "Modulo1" ' Nome del modulo VBA
     PercorsoFile = ThisWorkbook.Path & "\aggiornamento.txt" ' Percorso temporaneo
     
     ' URL del file su GitHub con autenticazione tramite token
-    URL = "https://raw.githubusercontent.com/jaupi-enrico/Excel_macros/main/Sheets/aggiornamento.txt"
+    URL = "https://raw.githubusercontent.com/jaupi-enrico/Excel_macros/main/aggiornamento.txt"
     
     ' Scarica il file
     Set Http = CreateObject("MSXML2.XMLHTTP")
@@ -34,11 +34,16 @@ Sub AggiornaCodiceVBA()
         
         ' Leggi il nuovo codice dal file salvato
         Open PercorsoFile For Input As #1
+        NuovoCodice = ""
         Do Until EOF(1)
             Line Input #1, Riga
             NuovoCodice = NuovoCodice & Riga & vbCrLf
         Loop
         Close #1
+        
+        ' Rimuove il BOM UTF-8
+        NuovoCodice = RimuoviBOM(NuovoCodice)
+
         
         ' Modifica direttamente il codice del modulo
         Set vbProj = ThisWorkbook.VBProject
@@ -53,3 +58,12 @@ Sub AggiornaCodiceVBA()
         MsgBox "Errore nel download del codice! Stato: " & Http.Status, vbCritical
     End If
 End Sub
+
+Function RimuoviBOM(Testo As String) As String
+    If Left(Testo, 3) = ChrW(&HFEFF) Then
+        RimuoviBOM = Mid(Testo, 4) ' Rimuove il BOM UTF-8
+    Else
+        RimuoviBOM = Testo
+    End If
+End Function
+
