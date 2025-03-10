@@ -14,11 +14,9 @@ Sub AggiornaCodiceVBA()
     For Each vbComp In vbProj.VBComponents
         ' Nome del modulo corrente
         ModuloNome = vbComp.Name
-        Debug.Print ModuloNome
         
         ' URL del file su GitHub
         URL = "https://raw.githubusercontent.com/jaupi-enrico/Excel_macros/main/" & ModuloNome & ".txt"
-        Debug.Print URL
         
         ' Scarica il file
         Set Http = CreateObject("MSXML2.XMLHTTP")
