@@ -23,13 +23,22 @@ Sub AggiornaCodiceVBA()
     Http.Send
     
     If Http.Status = 200 Then
-        ' Salva il file scaricato
+        ' Salva il file senza BOM
         Set Stream = CreateObject("ADODB.Stream")
         Stream.Type = 2
         Stream.Charset = "utf-8"
         Stream.Open
         Stream.WriteText Http.responseText
-        Stream.SaveToFile PercorsoFile, 2
+        Stream.Position = 0
+        Stream.Type = 1 ' Passa a modalità binaria
+        Stream.Position = 3 ' Salta il BOM
+        Dim StreamNoBOM As Object
+        Set StreamNoBOM = CreateObject("ADODB.Stream")
+        StreamNoBOM.Type = 1
+        StreamNoBOM.Open
+        StreamNoBOM.Write Stream.Read
+        StreamNoBOM.SaveToFile PercorsoFile, 2
+        StreamNoBOM.Close
         Stream.Close
         
         ' Leggi il nuovo codice dal file salvato
