@@ -1,82 +1,49 @@
 Sub AggiornaCodiceVBA()
     Dim Http As Object
-    Dim Stream As Object
     Dim vbProj As Object
     Dim vbComp As Object
     Dim ModuloNome As String
-    Dim PercorsoFile As String
     Dim URL As String
     Dim NuovoCodice As String
-    Dim Riga As String
-    
-    ' Questa e' una prova
+    Dim sheet As Object
 
-    ' Configura il modulo da aggiornare
-    ModuloNome = "Module1" ' Nome del modulo VBA
-    PercorsoFile = ThisWorkbook.Path & "\aggiornamento.txt" ' Percorso temporaneo
-    
-    ' URL del file su GitHub con autenticazione tramite token
-    URL = "https://raw.githubusercontent.com/jaupi-enrico/Excel_macros/main/aggiornamento.txt"
-    
-    ' Scarica il file
-    Set Http = CreateObject("MSXML2.XMLHTTP")
-    Http.Open "GET", URL, False
-    Http.setRequestHeader "Authorization", "token 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"
-    Http.Send
-    
-    If Http.Status = 200 Then
-        ' Salva il file senza BOM
-        Set Stream = CreateObject("ADODB.Stream")
-        Stream.Type = 2
-        Stream.Charset = "utf-8"
-        Stream.Open
-        Stream.WriteText Http.responseText
-        Stream.Position = 0
-        Stream.Type = 1 ' Passa a modalità binaria
-        Stream.Position = 3 ' Salta il BOM
-        Dim StreamNoBOM As Object
-        Set StreamNoBOM = CreateObject("ADODB.Stream")
-        StreamNoBOM.Type = 1
-        StreamNoBOM.Open
-        StreamNoBOM.Write Stream.Read
-        StreamNoBOM.SaveToFile PercorsoFile, 2
-        StreamNoBOM.Close
-        Stream.Close
-        
-        ' Leggi il nuovo codice dal file salvato
-        Open PercorsoFile For Input As #1
-        NuovoCodice = ""
-        Do Until EOF(1)
-            Line Input #1, Riga
-            NuovoCodice = NuovoCodice & Riga & vbCrLf
-        Loop
-        Close #1
-        
-        ' Rimuove il BOM UTF-8
-        NuovoCodice = RimuoviBOM(NuovoCodice)
+    ' Imposta il riferimento al progetto VBA
+    Set vbProj = ThisWorkbook.VBProject
 
+    ' Itera su tutti i moduli VBA
+    For Each vbComp In vbProj.VBComponents
+        ' Nome del modulo corrente
+        ModuloNome = vbComp.Name
+        Debug.Print ModuloNome
         
-        ' Modifica direttamente il codice del modulo
-        Set vbProj = ThisWorkbook.VBProject
-        Set vbComp = vbProj.VBComponents(ModuloNome).CodeModule
+        ' URL del file su GitHub
+        URL = "https://raw.githubusercontent.com/jaupi-enrico/Excel_macros/main/" & ModuloNome & ".txt"
+        Debug.Print URL
         
-        ' Cancella tutto il codice esistente e scrive il nuovo codice
-        vbComp.DeleteLines 1, vbComp.CountOfLines
-        vbComp.AddFromString NuovoCodice
+        ' Scarica il file
+        Set Http = CreateObject("MSXML2.XMLHTTP")
+        Http.Open "GET", URL, False
+        Http.setRequestHeader "Authorization", "token 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"
+        Http.Send
 
-	' Cancella il file ausiliario
-        Kill PercorsoFile
-        
-        MsgBox "Codice aggiornato con successo!", vbInformation
-    Else
-        MsgBox "Errore nel download del codice! Stato: " & Http.Status, vbCritical
-    End If
+        If Http.Status = 200 Then
+            ' Ottieni il codice dal file remoto
+            NuovoCodice = Http.responseText
+            
+            ' Rimuove il BOM UTF-8 se presente
+            If Left(NuovoCodice, 3) = ChrW(&HFEFF) Then
+                NuovoCodice = Mid(NuovoCodice, 4)
+            End If
+
+            ' Sostituisci il codice del modulo
+            With vbComp.CodeModule
+                .DeleteLines 1, .CountOfLines
+                .AddFromString NuovoCodice
+            End With
+        Else
+            MsgBox "Errore nel download del codice! Stato: " & Http.Status, vbCritical
+        End If
+    Next vbComp
+
+    MsgBox "Codice aggiornato con successo!", vbInformation
 End Sub
-
-Function RimuoviBOM(Testo As String) As String
-    If Left(Testo, 3) = ChrW(&HFEFF) Then
-        RimuoviBOM = Mid(Testo, 4) ' Rimuove il BOM UTF-8
-    Else
-        RimuoviBOM = Testo
-    End If
-End Function
