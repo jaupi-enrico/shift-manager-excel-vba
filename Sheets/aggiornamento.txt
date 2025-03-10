@@ -66,4 +66,3 @@ Function RimuoviBOM(Testo As String) As String
         RimuoviBOM = Testo
     End If
 End Function
-
