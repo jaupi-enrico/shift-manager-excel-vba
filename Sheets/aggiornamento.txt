@@ -10,11 +10,11 @@ Sub AggiornaCodiceVBA()
     Dim Riga As String
     
     ' Configura il modulo da aggiornare
-    ModuloNome = "Modulo1" ' Nome del modulo VBA
+    ModuloNome = "Module1" ' Nome del modulo VBA
     PercorsoFile = ThisWorkbook.Path & "\aggiornamento.txt" ' Percorso temporaneo
     
     ' URL del file su GitHub con autenticazione tramite token
-    URL = "https://raw.githubusercontent.com/jaupi-enrico/Excel_macros/main/aggiornamento.txt"
+    URL = "https://raw.githubusercontent.com/jaupi-enrico/Excel_macros/main/Sheets/aggiornamento.txt"
     
     ' Scarica il file
     Set Http = CreateObject("MSXML2.XMLHTTP")
