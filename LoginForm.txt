@@ -1,0 +1,27 @@
+Option Explicit
+
+Private Sub CancelButton_Click()
+    ' Torna al foglio DASHBOARD e chiudi il form
+    Worksheets("DASHBOARD").Activate
+    Me.Hide
+    Worksheets("Tabelle").Range("H3").Value = 0
+End Sub
+
+Private Sub EnterButton_Click()
+    Const CorrectPassword As String = "52428" ' Password corretta
+    If Trim(PasswordBox.Value) = CorrectPassword Then
+        Worksheets("Tabelle").Range("H3").Value = 1
+        Me.Hide ' Chiudi il UserForm
+    Else
+        MsgBox "Password errata :)", vbExclamation, "Errore di accesso"
+        PasswordBox.Value = "" ' Pulisci la TextBox
+        PasswordBox.SetFocus ' Torna alla TextBox
+        Worksheets("Tabelle").Range("H3").Value = 0
+    End If
+End Sub
+
+Private Sub UserForm_Activate()
+    ' Reimposta lo stato di login quando il form viene mostrato
+    Worksheets("Tabelle").Range("H3").Value = 0
+    PasswordBox.SetFocus ' Imposta il focus sulla TextBox
+End Sub

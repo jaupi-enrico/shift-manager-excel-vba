@@ -1,0 +1,34 @@
+Private SelectedOption As String
+
+Public Function GetSelectedOption() As String
+    Me.Show
+    GetSelectedOption = SelectedOption
+End Function
+
+Private Sub Cancel_button_Click()
+    ' Chiudi il form senza selezionare alcuna opzione
+    SelectedOption = ""
+    Me.Hide
+End Sub
+
+Private Sub Confirm_button_Click()
+    If Nome_Lineare.Value Then
+        SelectedOption = "Nome"
+    ElseIf Nome_cognome.Value Then
+        SelectedOption = "Nome_Cognome"
+    ElseIf Contratto.Value Then
+        SelectedOption = "Contratto"
+    ElseIf Ruolo.Value Then
+        SelectedOption = "Ruolo"
+    Else
+        MsgBox "Seleziona un'opzione prima di continuare.", vbExclamation
+        Exit Sub
+    End If
+    
+    ' Chiudi il form
+    Me.Hide
+End Sub
+
+Private Sub UserForm_Click()
+
+End Sub
