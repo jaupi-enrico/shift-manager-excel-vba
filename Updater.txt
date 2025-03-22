@@ -41,7 +41,7 @@ Sub AggiornaCodiceVBA()
                 .AddFromString NuovoCodice
             End With
         Else
-            MsgBox "Errore nel download del codice! Stato: " & Http.Status, vbCritical
+            MsgBox "Errore nel download del codice! Stato: " & Http.Status & " " & ModuloNome, vbCritical
         End If
     Next vbComp
 
