@@ -8,7 +8,10 @@ Sub AggiornaCodiceVBA()
     Dim URL As String
     Dim NuovoCodice As String
     Dim sheet As Object
-
+    Dim Updated As Boolean
+    
+    Updated = False
+    
     ' Imposta il riferimento al progetto VBA
     Set vbProj = ThisWorkbook.VBProject
 
@@ -27,6 +30,9 @@ Sub AggiornaCodiceVBA()
         Http.Send
 
         If Http.Status = 200 Then
+            
+            Updated = True
+            
             ' Ottieni il codice dal file remoto
             NuovoCodice = Http.responseText
             
@@ -40,10 +46,14 @@ Sub AggiornaCodiceVBA()
                 .DeleteLines 1, .CountOfLines
                 .AddFromString NuovoCodice
             End With
+        ElseIf Http.Status = 404 Then
+            Debug.Print "Pagina mancante: " & ModuloNome
         Else
             MsgBox "Errore nel download del codice! Stato: " & Http.Status & " " & ModuloNome, vbCritical
         End If
     Next vbComp
-
-    MsgBox "Codice aggiornato con successo!", vbInformation
+    
+    If Updated Then
+        MsgBox "Codice aggiornato con successo!", vbInformation
+    End If
 End Sub

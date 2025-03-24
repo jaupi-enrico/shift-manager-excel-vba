@@ -95,6 +95,7 @@ Private Sub Workbook_Open()
         End If
     Next sheet
     Worksheets(1).Activate
+    Call AggiornaCodiceVBA
 End Sub
 
 Private Sub Workbook_SheetActivate(ByVal Sh As Object)
