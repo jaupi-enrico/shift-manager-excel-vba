@@ -56,4 +56,6 @@ Sub AggiornaCodiceVBA()
     If Updated Then
         MsgBox "Codice aggiornato con successo!", vbInformation
     End If
+
+    Cells(29, 2).Value = "Aggiornato"
 End Sub

@@ -7,9 +7,9 @@ Set fso = CreateObject("Scripting.FileSystemObject")
 Set objShell = CreateObject("Shell.Application")
 
 ' Imposta il percorso del file Excel
-excelFile = "C:\Percorso\TuoFile.xlsm"
+excelFile = "D:\Scuola\Autodidatta\Excel_VBA\Orari\Orari_Crew_week 01_(30-05_01_25).xlsm"
 zipFile = excelFile & ".zip"
-estrazioneCartella = "C:\Percorso\Estratto"
+estrazioneCartella = "D:\Scuola\Autodidatta\Excel_VBA\Orari"
 
 ' Rinomina il file Excel in ZIP
 If fso.FileExists(excelFile) Then
@@ -57,7 +57,7 @@ If fso.FileExists(vbaProjectPath) Then
 
     WScript.Echo "La password VBA è stata rimossa con successo!"
 Else
-    WScript.Echo "Errore: Il file vbaProject.bin non è stato trovato!"
+    WScript.Echo "Errore: Il file vbaProject.bin non e' stato trovato!"
 End If
 
 ' Funzione per leggere il contenuto binario di un file
