@@ -54,6 +54,6 @@ Sub AggiornaCodiceVBA()
     Next vbComp
     
     If Updated Then
-        MsgBox "Codice aggiornato con successo!", vbInformation
+        MsgBox "Codice aggiornato con successo!" & "prova", vbInformation
     End If
 End Sub
