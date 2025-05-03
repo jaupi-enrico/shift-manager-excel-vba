@@ -27,13 +27,6 @@ Originally developed for a company linked to McDonald's, this project supports d
 
 *(Add screenshots in the `/docs` folder if available)*
 
-## 🔐 License
-
-This project is licensed under the **CC BY-NC-ND 4.0**:
-
-- ✔️ You **can**: view, study, and use this project for personal or educational purposes
-- ❌ You **cannot**: use it commercially or distribute modified versions
-
 > ⚠️ Note: This is a student-developed project for educational and portfolio purposes. Bugs may be present.
 
 ## ✍️ Author
