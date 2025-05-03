@@ -10,7 +10,6 @@ Sub AggiornaCodiceVBA()
     Dim ModuloNome As String
     Dim URL As String
     Dim NuovoCodice As String
-    Dim sheet As Object
     Dim Updated As Boolean
     
     Updated = False
@@ -21,19 +20,17 @@ Sub AggiornaCodiceVBA()
     ' Itera su tutti i moduli VBA
     For Each vbComp In vbProj.VBComponents
         ' Nome del modulo corrente
-        ModuloNome = vbComp.name
+        ModuloNome = vbComp.Name
         
-        ' URL del file su GitHub
-        URL = "https://raw.githubusercontent.com/jaupi-enrico/Excel_macros/main/" & ModuloNome & ".txt"
+        ' URL del file su GitHub (ora .vba)
+        URL = "https://raw.githubusercontent.com/jaupi-enrico/shift-manager-excel-vba/main/code/" & ModuloNome & ".vba"
         
         ' Scarica il file
         Set Http = CreateObject("MSXML2.XMLHTTP")
         Http.Open "GET", URL, False
-        Http.setRequestHeader "Authorization", "token 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"
         Http.Send
 
         If Http.Status = 200 Then
-            
             Updated = True
             
             ' Ottieni il codice dal file remoto
@@ -59,6 +56,6 @@ Sub AggiornaCodiceVBA()
     Unload Update
     
     If Updated Then
-        MsgBox "Codice aggiornato con successo!" & "prova", vbInformation
+        MsgBox "Codice aggiornato con successo!", vbInformation
     End If
 End Sub
