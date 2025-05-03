@@ -7,7 +7,7 @@ Originally developed for a company linked to McDonald's, this project supports d
 
 - Add/remove/update employees across sheets
 - Assign roles, contracts, and pause schedules
-- Highlight absences (ferie, malattia, formazione)
+- Highlight absences (days-off, sick-days, formation-days)
 - Protect sheets while keeping flexibility
 - Full Excel automation via VBA
 
@@ -27,11 +27,20 @@ Originally developed for a company linked to McDonald's, this project supports d
 
 *(Add screenshots in the `/docs` folder if available)*
 
-## License
+## 🔐 License
 
-[MIT](LICENSE)
+This project is licensed under the **CC BY-NC-ND 4.0**:
 
-## Author
+- ✔️ You **can**: view, study, and use this project for personal or educational purposes
+- ❌ You **cannot**: use it commercially or distribute modified versions
 
-Developed by Enrico, ITIS Castelli - 2025  
-Part of a real-world business project
+> ⚠️ Note: This is a student-developed project for educational and portfolio purposes. Bugs may be present.
+
+## ✍️ Author
+
+**Enrico Jaupi**  
+Computer Science Student — ITIS Castelli  
+Participant in the Italian Olympiads of Informatics & Mathematics  
+🔗 [GitHub](https://github.com/jaupi-enrico)
+
+---

@@ -95,12 +95,11 @@ Private Sub Workbook_Open()
         End If
     Next sheet
     Worksheets(1).Activate
-    Call AggiornaCodiceVBA
 End Sub
 
 Private Sub Workbook_SheetActivate(ByVal Sh As Object)
     Dim ProtectedSheets As Variant
-    ProtectedSheets = Array("Fasce_Tot", "Percentuali", "Tabelle") ' Elenco dei fogli protetti
+    ProtectedSheets = Array("Fasce_Tot", "Percentuali", "Tabelle", "Dipendenti") ' Elenco dei fogli protetti
     
     If Not IsError(Application.Match(Sh.name, ProtectedSheets, 0)) Then
         LoginForm.Show ' Mostra il form di login
@@ -137,7 +136,7 @@ Private Sub Workbook_BeforePrint(Cancel As Boolean)
     
     ' Loop attraverso i fogli
     For Each sheet In Worksheets
-        ' Controlla se il nome del foglio è tra i giorni della settimana
+        ' Controlla se il nome del foglio   tra i giorni della settimana
         If sheet.name = "LUN" Or _
            sheet.name = "MAR" Or _
            sheet.name = "MER" Or _
@@ -153,7 +152,7 @@ Private Sub Workbook_BeforePrint(Cancel As Boolean)
 
             If Not names_range Is Nothing Then
                 For Each cell_y In names_range
-                    If Not IsEmpty(cell_y.Interior.Color) And cell_y.Interior.Color = RGB(217, 217, 217) Then
+                    If Not IsEmpty(cell_y.Interior.color) And cell_y.Interior.color = RGB(217, 217, 217) Then
                         clear = True
                         clear_up = True
                         clear_down = True
@@ -250,3 +249,4 @@ ErrorHandler:
     MsgBox "Errore: " & Err.Description & " (Codice " & Err.Number & ") nel foglio " & sheet.name, vbCritical
     Exit Sub
 End Sub
+

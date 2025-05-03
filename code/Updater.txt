@@ -1,6 +1,9 @@
 Option Explicit
 
 Sub AggiornaCodiceVBA()
+    Update.Show
+    DoEvents ' Permette il disegno della form prima di proseguire
+    
     Dim Http As Object
     Dim vbProj As Object
     Dim vbComp As Object
@@ -52,6 +55,8 @@ Sub AggiornaCodiceVBA()
             MsgBox "Errore nel download del codice! Stato: " & Http.Status & " " & ModuloNome, vbCritical
         End If
     Next vbComp
+    
+    Unload Update
     
     If Updated Then
         MsgBox "Codice aggiornato con successo!" & "prova", vbInformation

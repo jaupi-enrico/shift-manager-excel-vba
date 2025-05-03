@@ -1,0 +1,6 @@
+*.xlsb
+*.xlsx
+*.xls
+*.xlsm
+*.tmp
+~$*
