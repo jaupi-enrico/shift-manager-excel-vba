@@ -1,7 +1,7 @@
 Option Explicit
 
 Sub AggiornaCodiceVBA()
-    Update.Show
+    Update.Show vbModeless
     DoEvents ' Permette il disegno della form prima di proseguire
     
     Dim Http As Object
