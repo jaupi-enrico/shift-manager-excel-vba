@@ -25,9 +25,15 @@ Originally developed for a company linked to McDonald's, this project supports d
 
 ## Screenshots
 
-*(Add screenshots in the `/docs` folder if available)*
+- Shifts
+<img src="https://github.com/jaupi-enrico/shift-manager-excel-vba/blob/main/docs/lineare.png">
+- Recap
+<img src="https://github.com/jaupi-enrico/shift-manager-excel-vba/blob/main/docs/totalone.png">
+- Workers
+<img src="https://github.com/jaupi-enrico/shift-manager-excel-vba/blob/main/docs/dipendenti.png">
 
 > ⚠️ Note: This is a student-developed project for educational and portfolio purposes. Bugs may be present.
+> Black boxes are present in the screenshots to protect the privacy of real workers, they aren't present in the real file
 
 ## ✍️ Author
 
