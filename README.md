@@ -27,8 +27,10 @@ Originally developed for a company linked to McDonald's, this project supports d
 
 - Shifts
 <img src="https://github.com/jaupi-enrico/shift-manager-excel-vba/blob/main/docs/lineare.png">
+
 - Recap
 <img src="https://github.com/jaupi-enrico/shift-manager-excel-vba/blob/main/docs/totalone.png">
+
 - Workers
 <img src="https://github.com/jaupi-enrico/shift-manager-excel-vba/blob/main/docs/dipendenti.png">
 
