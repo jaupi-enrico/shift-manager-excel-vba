@@ -4,6 +4,8 @@ Sub AggiornaCodiceVBA()
     Update.Show vbModeless
     DoEvents ' Permette il disegno della form prima di proseguire
     
+    On Error GoTo ErrorHandler
+
     Dim Http As Object
     Dim vbProj As Object
     Dim vbComp As Object
@@ -58,4 +60,8 @@ Sub AggiornaCodiceVBA()
     If Updated Then
         MsgBox "Codice aggiornato con successo!", vbInformation
     End If
+
+ErrorHandler:
+    ' Gestione degli errori
+    MsgBox "Errore: " & Err.Description, vbCritical + vbOKOnly + vbDefaultButton1
 End Sub
