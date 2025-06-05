@@ -22,7 +22,7 @@ Sub AggiornaCodiceVBA()
     ' Itera su tutti i moduli VBA
     For Each vbComp In vbProj.VBComponents
         ' Nome del modulo corrente
-        ModuloNome = vbComp.Name
+        ModuloNome = vbComp.name
         
         ' URL del file su GitHub (ora .vba)
         URL = "https://raw.githubusercontent.com/jaupi-enrico/shift-manager-excel-vba/main/code/" & ModuloNome & ".vba"
@@ -60,8 +60,13 @@ Sub AggiornaCodiceVBA()
     If Updated Then
         MsgBox "Codice aggiornato con successo!", vbInformation
     End If
-
+    
+    GoTo Continue
+    
 ErrorHandler:
     ' Gestione degli errori
     MsgBox "Errore: " & Err.Description, vbCritical + vbOKOnly + vbDefaultButton1
+    
+Continue:
+
 End Sub
