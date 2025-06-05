@@ -60,13 +60,17 @@ Sub AggiornaCodiceVBA()
     If Updated Then
         MsgBox "Codice aggiornato con successo!", vbInformation
     End If
-    
+
     GoTo Continue
-    
+
 ErrorHandler:
     ' Gestione degli errori
-    MsgBox "Errore: " & Err.Description, vbCritical + vbOKOnly + vbDefaultButton1
-    
-Continue:
+    Unload Update
+    If Err.Number = 1004 Then
+        MsgBox "Abilita i permessi sugli oggetti come spiegato nella dashboard!"
+    Else
+        MsgBox "Errore: " & Err.Number, vbCritical + vbOKOnly + vbDefaultButton1
+    End If
 
+Continue:
 End Sub
