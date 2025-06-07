@@ -422,6 +422,7 @@ ErrorHandler:
 End Sub
 
 Sub Add_Manager()
+    Call ShowSheets
     Dim manager_row As Integer
 
     manager_row = 4
@@ -438,5 +439,5 @@ Sub Add_Manager()
     ActiveSheet.Rows(manager_row + 1).PasteSpecial xlPasteAll
 
     Range(Cells(manager_row + 1, 58), Cells(manager_row + 1, 72)).Value = ""
-
+    Call HideSheets
 End Sub

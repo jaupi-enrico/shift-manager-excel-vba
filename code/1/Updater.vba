@@ -25,7 +25,7 @@ Sub AggiornaCodiceVBA()
         ModuloNome = vbComp.name
         
         ' URL del file su GitHub (ora .vba)
-        URL = "https://raw.githubusercontent.com/jaupi-enrico/shift-manager-excel-vba/main/code/" & ModuloNome & ".vba"
+        URL = "https://raw.githubusercontent.com/jaupi-enrico/shift-manager-excel-vba/main/code/1/" & ModuloNome & ".vba"
         
         ' Scarica il file
         Set Http = CreateObject("MSXML2.XMLHTTP")

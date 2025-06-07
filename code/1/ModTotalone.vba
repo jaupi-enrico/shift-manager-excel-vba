@@ -151,7 +151,7 @@ Function Paint_Worker(ByVal Pos As Integer, ByVal Role As Integer)
     End With
 End Function
 
-Function Check_Days(ByVal Worker As Integer)
+Function Check_Days(ByVal Worker As Integer, ByVal WorkerRole As Integer)
     Dim wsDip As Worksheet, wsTOT As Worksheet
     Dim LastRow As Integer, i As Integer
     Set wsDip = Worksheets("Dipendenti")
@@ -195,6 +195,7 @@ Function Check_Days(ByVal Worker As Integer)
     ElseIf wsDip.Cells(Worker, 1).Value = "No" And wsTOT.Cells(Worker + 1, 1).Interior.color = RGB(241, 170, 131) Then
         wsTOT.Range(wsTOT.Cells(Worker + 2, 4), wsTOT.Cells(Worker + 2, 17)).Copy
         wsTOT.Range(wsTOT.Cells(Worker + 1, 4), wsTOT.Cells(Worker + 1, 17)).PasteSpecial xlPasteAll
+        Paint_Worker(Worker + 1, WorkerRole)
         wsTOT.Cells(Worker + 1, 1).Interior.color = RGB(255, 255, 255)
     End If
 End Function
@@ -290,19 +291,19 @@ Sub Update_Workers()
             wsTOT.Cells(WorkerPos + 3, 3).Value = WorkerName_Surname And _
             wsTOT.Cells(WorkerPos + 3, 27).Value = WorkerContract And _
             wsTOT.Cells(WorkerPos + 3, 2).Interior.color = color Then
-                Call Check_Days(Worker)
+                Call Check_Days(Worker, WorkerRole)
             Else
                 Call Add_Worker(WorkerName, WorkerName_Surname, WorkerContract, Worker - 2)
                 WorkerPos = NameFound(WorkerName, Worker + 1) - 3
                 Call Transfer_data(WorkerPos + 3, Worker + 1)
                 Call Delete_Worker(WorkerPos)
-                Call Check_Days(Worker)
+                Call Check_Days(Worker, WorkerRole)
                 Call Paint_Worker(Worker + 1, WorkerRole)
             End If
         Else
             Call Add_Worker(WorkerName, WorkerName_Surname, WorkerContract, Worker - 2)
             Call Paint_Worker(Worker + 1, WorkerRole)
-            Call Check_Days(Worker)
+            Call Check_Days(Worker, WorkerRole)
         End If
         Worker = Worker + 1
     Wend
