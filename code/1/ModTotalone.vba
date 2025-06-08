@@ -195,7 +195,7 @@ Function Check_Days(ByVal Worker As Integer, ByVal WorkerRole As Integer)
     ElseIf wsDip.Cells(Worker, 1).Value = "No" And wsTOT.Cells(Worker + 1, 1).Interior.color = RGB(241, 170, 131) Then
         wsTOT.Range(wsTOT.Cells(Worker + 2, 4), wsTOT.Cells(Worker + 2, 17)).Copy
         wsTOT.Range(wsTOT.Cells(Worker + 1, 4), wsTOT.Cells(Worker + 1, 17)).PasteSpecial xlPasteAll
-        Paint_Worker(Worker + 1, WorkerRole)
+        Call Paint_Worker(Worker + 1, WorkerRole)
         wsTOT.Cells(Worker + 1, 1).Interior.color = RGB(255, 255, 255)
     End If
 End Function
