@@ -3,7 +3,7 @@ Option Explicit
 Private Sub Worksheet_Change(ByVal Target As Range)
     Dim rngMalattieCorsi As Range
     Dim LastRow As Integer
-    Dim Colum As Integer
+    Dim Column As Integer
     Dim r As Long
     
     If Application.Ready = False Then Exit Sub
@@ -23,47 +23,47 @@ Private Sub Worksheet_Change(ByVal Target As Range)
     If Not Intersect(Target, rngMalattieCorsi) Is Nothing Then
         If Target.Column = 6 Then
             If Target.Value = "No" Then
-                Colum = 10
-                While Cells(Target.Row, Columns).Value <> ""
-                    Cells(Target.Row, Columns).Value = "No"
-                    Colum = Colum + 1
+                Column = 10
+                While Cells(Target.Row, Column).Value <> ""
+                    Cells(Target.Row, Column).Value = "No"
+                    Column = Column + 1
                 Wend
             End If
             If Target.Value = "Si" Then
-                Colum = 10
-                While Cells(Target.Row, Columns).Value <> ""
-                    Cells(Target.Row, Columns).Value = "Si"
-                    Colum = Colum + 1
+                Column = 10
+                While Cells(Target.Row, Column).Value <> ""
+                    Cells(Target.Row, Column).Value = "Si"
+                    Column = Column + 1
                 Wend
             End If
         ElseIf Target.Column = 7 Then
             If Target.Value = "No" Then
-                Colum = 18
-                While Cells(Target.Row, Columns).Value <> ""
-                    Cells(Target.Row, Columns).Value = "No"
-                    Colum = Colum + 1
+                Column = 18
+                While Cells(Target.Row, Column).Value <> ""
+                    Cells(Target.Row, Column).Value = "No"
+                    Column = Column + 1
                 Wend
             End If
             If Target.Value = "Si" Then
-                Colum = 18
-                While Cells(Target.Row, Columns).Value <> ""
-                    Cells(Target.Row, Columns).Value = "Si"
-                    Colum = Colum + 1
+                Column = 18
+                While Cells(Target.Row, Column).Value <> ""
+                    Cells(Target.Row, Column).Value = "Si"
+                    Column = Column + 1
                 Wend
             End If
         ElseIf Target.Column = 8 Then
             If Target.Value = "No" Then
-                Colum = 26
-                While Cells(Target.Row, Columns).Value <> ""
-                    Cells(Target.Row, Columns).Value = "No"
-                    Colum = Colum + 1
+                Column = 26
+                While Cells(Target.Row, Column).Value <> ""
+                    Cells(Target.Row, Column).Value = "No"
+                    Column = Column + 1
                 Wend
             End If
             If Target.Value = "Si" Then
-                Colum = 26
-                While Cells(Target.Row, Columns).Value <> ""
-                    Cells(Target.Row, Columns).Value = "Si"
-                    Colum = Colum + 1
+                Column = 26
+                While Cells(Target.Row, Column).Value <> ""
+                    Cells(Target.Row, Column).Value = "Si"
+                    Column = Column + 1
                 Wend
             End If
         End If
