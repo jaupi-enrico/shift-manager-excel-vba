@@ -31,6 +31,8 @@ Private Sub Worksheet_SelectionChange(ByVal Target As Range)
         ActiveSheet.Unprotect Password:=Password
     ElseIf Target.Row >= Row And Target.Row <= LastRow And Target.Column >= 58 And Target.Column <= 72 Then
         ActiveSheet.Unprotect Password:=Password
+    ElseIf Target.Row >= Row And Target.Row <= LastRow And Target.Column = 1 Then
+        ActiveSheet.Unprotect Password:=Password
     Else
         ActiveSheet.Protect Password:=Password
     End If    

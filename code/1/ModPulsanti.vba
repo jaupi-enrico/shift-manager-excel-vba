@@ -438,6 +438,7 @@ Sub Add_Manager()
     ActiveSheet.Rows(manager_row).Copy
     ActiveSheet.Rows(manager_row + 1).PasteSpecial xlPasteAll
 
+    Call ShowSheets
     Range(Cells(manager_row + 1, 58), Cells(manager_row + 1, 72)).Value = ""
     Call HideSheets
 End Sub
