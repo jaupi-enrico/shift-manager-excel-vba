@@ -100,6 +100,8 @@ End Sub
 
 Private Sub Workbook_SheetActivate(ByVal Sh As Object)
     Dim ProtectedSheets As Variant
+    Dim Password As String
+    Password = "Ej20082018*Excel"
     ProtectedSheets = Array("Fasce_Tot", "Percentuali", "Tabelle", "Dipendenti") ' Elenco dei fogli protetti
     
     If Not IsError(Application.Match(Sh.name, ProtectedSheets, 0)) Then
@@ -109,6 +111,8 @@ Private Sub Workbook_SheetActivate(ByVal Sh As Object)
             MsgBox "Accesso negato. Verrai reindirizzato alla Dashboard.", vbExclamation, "Autenticazione richiesta"
             Worksheets("DASHBOARD").Activate
         End If
+    Else
+        Sh.Unprotect Password:=Password
     End If
 End Sub
 
