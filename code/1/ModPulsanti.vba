@@ -149,7 +149,7 @@ Sub Delete_names()
                 Next name
             End If
         Next sheet
-    
+    End if
 Cleanup:
         
     columnF = 0
