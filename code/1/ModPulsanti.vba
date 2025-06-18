@@ -61,6 +61,7 @@ Sub Delete_images()
 End Sub
 
 Sub Delete_names()
+    Call ShowSheets
     Dim Answer As Long
     Answer = MsgBox("Sei sicuro di togliere i nomi?", vbYesNo + vbDefaultButton2)
         
@@ -151,13 +152,13 @@ Sub Delete_names()
     
 Cleanup:
         
-        columnF = 0
-        columnI = 0
-        
-        ' Riabilita gli eventi
-        Application.EnableEvents = True
-        
-    End If
+    columnF = 0
+    columnI = 0
+    
+    Call HideSheets
+
+    ' Riabilita gli eventi
+     Application.EnableEvents = True
 End Sub
 
 Sub Show_Lines()
