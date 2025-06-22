@@ -22,11 +22,19 @@ Sub Add_Worker(ByVal WorkerName As String, ByVal WorkerName_Surname As String, B
     wsFORM.Rows(WorkerPos + 3).Insert Shift:=xlDown
     DoEvents
 
-    wsTOT.Rows(LastRow).Copy
-    wsTOT.Rows(WorkerPos + 3).PasteSpecial xlPasteAll
-    wsFORM.Rows(LastRow).Copy
-    wsFORM.Rows(WorkerPos + 3).PasteSpecial xlPasteAll
-    DoEvents
+    If wsTOT.Cells(LastRow, 30).Value <> "" Then
+        wsTOT.Rows(LastRow).Copy
+        wsTOT.Rows(WorkerPos + 3).PasteSpecial xlPasteAll
+        wsFORM.Rows(LastRow).Copy
+        wsFORM.Rows(WorkerPos + 3).PasteSpecial xlPasteAll
+        DoEvents
+    Else
+        wsTOT.Rows(4).Copy
+        wsTOT.Rows(WorkerPos + 3).PasteSpecial xlPasteAll
+        wsFORM.Rows(4).Copy
+        wsFORM.Rows(WorkerPos + 3).PasteSpecial xlPasteAll
+        DoEvents
+    End If
 
 
     wsTOT.Cells(WorkerPos + 3, 1).Value = WorkerPos
