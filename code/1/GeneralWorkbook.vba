@@ -13,6 +13,7 @@ Private Sub Workbook_BeforeClose(Cancel As Boolean)
     Password = "Ej20082018*Excel"
     
     If Answer = vbYes Then
+        Application.ScreenUpdating = False
         Worksheets(1).Activate
         For Each sheet In Worksheets
             sheet.Protect Password:=Password
@@ -22,27 +23,44 @@ Private Sub Workbook_BeforeClose(Cancel As Boolean)
                 sheet.name = "GIO" Or _
                 sheet.name = "VEN" Or _
                 sheet.name = "SAB" Or _
-                sheet.name = "DOM" Then
+                sheet.name = "DOM" Or _
+                sheet.name = "LUN-M" Or _
+                sheet.name = "MAR-M" Or _
+                sheet.name = "MER-M" Or _
+                sheet.name = "GIO-M" Or _
+                sheet.name = "VEN-M" Or _
+                sheet.name = "SAB-M" Or _
+                sheet.name = "DOM-M" Then
                     sheet.Activate
                     ActiveWindow.FreezePanes = False
             End If
         Next sheet
+        Application.ScreenUpdating = True
         ThisWorkbook.Save
     ElseIf Answer = vbNo Then
         If ChangedAfterSave = False Then
+            Application.ScreenUpdating = False
             For Each sheet In Worksheets
                 sheet.Protect Password:=Password
                 If sheet.name = "LUN" Or _
-                sheet.name = "MAR" Or _
-                sheet.name = "MER" Or _
-                sheet.name = "GIO" Or _
-                sheet.name = "VEN" Or _
-                sheet.name = "SAB" Or _
-                sheet.name = "DOM" Then
-                    sheet.Activate
-                    ActiveWindow.FreezePanes = False
+                    sheet.name = "MAR" Or _
+                    sheet.name = "MER" Or _
+                    sheet.name = "GIO" Or _
+                    sheet.name = "VEN" Or _
+                    sheet.name = "SAB" Or _
+                    sheet.name = "DOM" Or _
+                    sheet.name = "LUN-M" Or _
+                    sheet.name = "MAR-M" Or _
+                    sheet.name = "MER-M" Or _
+                    sheet.name = "GIO-M" Or _
+                    sheet.name = "VEN-M" Or _
+                    sheet.name = "SAB-M" Or _
+                    sheet.name = "DOM-M" Then
+                        sheet.Activate
+                        ActiveWindow.FreezePanes = False
                 End If
             Next sheet
+            Application.ScreenUpdating = True
         ThisWorkbook.Save
         End If
         Closing = True
@@ -67,7 +85,14 @@ Private Sub Workbook_BeforeSave(ByVal SaveAsUI As Boolean, Cancel As Boolean)
                 sheet.name = "GIO" Or _
                 sheet.name = "VEN" Or _
                 sheet.name = "SAB" Or _
-                sheet.name = "DOM" Then
+                sheet.name = "DOM" Or _
+                sheet.name = "LUN-M" Or _
+                sheet.name = "MAR-M" Or _
+                sheet.name = "MER-M" Or _
+                sheet.name = "GIO-M" Or _
+                sheet.name = "VEN-M" Or _
+                sheet.name = "SAB-M" Or _
+                sheet.name = "DOM-M" Then
                     sheet.Activate
                     ActiveWindow.FreezePanes = False
             End If
@@ -88,7 +113,14 @@ Private Sub Workbook_Open()
             sheet.name = "GIO" Or _
             sheet.name = "VEN" Or _
             sheet.name = "SAB" Or _
-            sheet.name = "DOM" Then
+            sheet.name = "DOM" Or _
+            sheet.name = "LUN-M" Or _
+            sheet.name = "MAR-M" Or _
+            sheet.name = "MER-M" Or _
+            sheet.name = "GIO-M" Or _
+            sheet.name = "VEN-M" Or _
+            sheet.name = "SAB-M" Or _
+            sheet.name = "DOM-M" Then
                 sheet.Activate
                 Range("F16").Activate
                 ActiveWindow.FreezePanes = True
@@ -102,7 +134,7 @@ Private Sub Workbook_SheetActivate(ByVal Sh As Object)
     Dim ProtectedSheets As Variant
     Dim Password As String
     Password = "Ej20082018*Excel"
-    ProtectedSheets = Array("Fasce_Tot", "Percentuali", "Tabelle", "Dipendenti") ' Elenco dei fogli protetti
+    ProtectedSheets = Array("Fasce_Tot", "Percentuali", "Tabelle", "Dipendenti", "Dipendenti-M") ' Elenco dei fogli protetti
     
     If Not IsError(Application.Match(Sh.name, ProtectedSheets, 0)) Then
         LoginForm.Show ' Mostra il form di login
@@ -148,8 +180,14 @@ Private Sub Workbook_BeforePrint(Cancel As Boolean)
            sheet.name = "GIO" Or _
            sheet.name = "VEN" Or _
            sheet.name = "SAB" Or _
-           sheet.name = "DOM" Then
-
+           sheet.name = "DOM" Or _
+           sheet.name = "LUN-M" Or _
+           sheet.name = "MAR-M" Or _
+           sheet.name = "MER-M" Or _
+           sheet.name = "GIO-M" Or _
+           sheet.name = "VEN-M" Or _
+           sheet.name = "SAB-M" Or _
+           sheet.name = "DOM-M" Then
             ' Prova a definire l'intervallo specifico sul foglio corrente
             On Error Resume Next
             Set names_range = sheet.Range("A17:A164")
@@ -254,4 +292,3 @@ ErrorHandler:
     MsgBox "Errore: " & Err.Description & " (Codice " & Err.Number & ") nel foglio " & sheet.name, vbCritical
     Exit Sub
 End Sub
-

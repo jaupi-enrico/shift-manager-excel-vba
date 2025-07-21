@@ -47,8 +47,10 @@ Sub Delete_images()
     For Each sheet In Worksheets
         ' Escludi i fogli "DASHBOARD" e "TOT"
         If sheet.name <> "DASHBOARD" And sheet.name <> "TOT" And _
-           sheet.name <> "Dipendenti" And sheet.name <> "FORMAZIONE" Then
-        
+           sheet.name <> "Dipendenti" And sheet.name <> "FORMAZIONE" And _
+           sheet.name <> "Dipendenti-M" And sheet.name <> "FORMAZIONE-M" And _
+           sheet.name <> "TOT-M" Then
+
             ' Cicla attraverso ogni forma presente nel foglio
             For Each shp In sheet.Shapes
                 ' Elimina l'oggetto
@@ -99,8 +101,15 @@ Sub Delete_names()
                sheet.name = "GIO" Or _
                sheet.name = "VEN" Or _
                sheet.name = "SAB" Or _
-               sheet.name = "DOM" Then
-                
+               sheet.name = "DOM" Or _
+               sheet.name = "LUN-M" Or _
+               sheet.name = "MAR-M" Or _
+               sheet.name = "MER-M" Or _
+               sheet.name = "GIO-M" Or _
+               sheet.name = "VEN-M" Or _
+               sheet.name = "SAB-M" Or _
+               sheet.name = "DOM-M" Then
+
                 If Impresa = False Then
                     Set rngNames = sheet.Range("A17:A153")
                 ElseIf Impresa = True Then
@@ -187,7 +196,14 @@ Sub Show_Lines()
            sheet.name = "GIO" Or _
            sheet.name = "VEN" Or _
            sheet.name = "SAB" Or _
-           sheet.name = "DOM" Then
+           sheet.name = "DOM" Or _
+           sheet.name = "LUN-M" Or _
+           sheet.name = "MAR-M" Or _
+           sheet.name = "MER-M" Or _
+           sheet.name = "GIO-M" Or _
+           sheet.name = "VEN-M" Or _
+           sheet.name = "SAB-M" Or _
+           sheet.name = "DOM-M" Then
 
             ' Prova a definire l'intervallo specifico sul foglio corrente
             On Error Resume Next
@@ -317,7 +333,14 @@ Sub Hide_Lines()
            sheet.name = "GIO" Or _
            sheet.name = "VEN" Or _
            sheet.name = "SAB" Or _
-           sheet.name = "DOM" Then
+           sheet.name = "DOM" Or _
+           sheet.name = "LUN-M" Or _
+           sheet.name = "MAR-M" Or _
+           sheet.name = "MER-M" Or _
+           sheet.name = "GIO-M" Or _
+           sheet.name = "VEN-M" Or _
+           sheet.name = "SAB-M" Or _
+           sheet.name = "DOM-M" Then
 
             ' Prova a definire l'intervallo specifico sul foglio corrente
             On Error Resume Next
@@ -420,26 +443,4 @@ Exit Sub
 ErrorHandler:
     MsgBox "Errore: " & Err.Description & " (Codice " & Err.Number & ") nel foglio " & sheet.name, vbCritical
     Exit Sub
-End Sub
-
-Sub Add_Manager()
-    Call ShowSheets
-    Dim manager_row As Integer
-
-    manager_row = 4
-
-    While Cells(manager_row, 58) <> ""
-        manager_row = manager_row + 1
-    Wend
-    manager_row = manager_row - 1
-
-
-    ActiveSheet.Rows(manager_row + 1).Insert Shift:=xlDown
-    DoEvents
-    ActiveSheet.Rows(manager_row).Copy
-    ActiveSheet.Rows(manager_row + 1).PasteSpecial xlPasteAll
-
-    Call ShowSheets
-    Range(Cells(manager_row + 1, 58), Cells(manager_row + 1, 72)).Value = ""
-    Call HideSheets
 End Sub

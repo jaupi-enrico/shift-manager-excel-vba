@@ -4,11 +4,11 @@ Sub Add_Worker(ByVal WorkerName As String, ByVal WorkerName_Surname As String, B
     Dim wsTOT As Worksheet, wsFORM As Worksheet
     Dim LastRow As Integer, i As Integer
 
-    Set wsTOT = Worksheets("TOT")
-    Set wsFORM = Worksheets("FORMAZIONE")
+    Set wsTOT = Worksheets("TOT-M")
+    Set wsFORM = Worksheets("FORMAZIONE-M")
 
     LastRow = 4
-    While wsTOT.Cells(LastRow, 2).Value <> "IMPRESA1"
+    While wsTOT.Cells(LastRow, 2).Value <> ""
         LastRow = LastRow + 1
     Wend
 
@@ -22,11 +22,19 @@ Sub Add_Worker(ByVal WorkerName As String, ByVal WorkerName_Surname As String, B
     wsFORM.Rows(WorkerPos + 3).Insert Shift:=xlDown
     DoEvents
 
-    wsTOT.Rows(LastRow).Copy
-    wsTOT.Rows(WorkerPos + 3).PasteSpecial xlPasteAll
-    wsFORM.Rows(LastRow).Copy
-    wsFORM.Rows(WorkerPos + 3).PasteSpecial xlPasteAll
-    DoEvents
+    If wsTOT.Cells(LastRow, 30).Value <> "" Then
+        wsTOT.Rows(LastRow).Copy
+        wsTOT.Rows(WorkerPos + 3).PasteSpecial xlPasteAll
+        wsFORM.Rows(LastRow).Copy
+        wsFORM.Rows(WorkerPos + 3).PasteSpecial xlPasteAll
+        DoEvents
+    Else
+        wsTOT.Rows(4).Copy
+        wsTOT.Rows(WorkerPos + 3).PasteSpecial xlPasteAll
+        wsFORM.Rows(4).Copy
+        wsFORM.Rows(WorkerPos + 3).PasteSpecial xlPasteAll
+        DoEvents
+    End If
 
 
     wsTOT.Cells(WorkerPos + 3, 1).Value = WorkerPos
@@ -60,15 +68,15 @@ End Sub
 ' Elimina un lavoratore
 Sub Delete_Worker(ByVal WorkerPos As Integer)
     Dim wsTOT As Worksheet, wsFORM As Worksheet, LastRow As Integer, i As Integer
-    Set wsTOT = Worksheets("TOT")
-    Set wsFORM = Worksheets("FORMAZIONE")
+    Set wsTOT = Worksheets("TOT-M")
+    Set wsFORM = Worksheets("FORMAZIONE-M")
 
     wsTOT.Rows(WorkerPos + 3).Delete
     wsFORM.Rows(WorkerPos + 3).Delete
     DoEvents
 
     LastRow = 4
-    While wsTOT.Cells(LastRow, 2).Value <> "IMPRESA1" And LastRow < Rows.Count
+    While wsTOT.Cells(LastRow, 2).Value <> "" And LastRow < Rows.Count
         LastRow = LastRow + 1
     Wend
 
@@ -86,7 +94,7 @@ Function NameFound(ByVal WorkerName As String, ByVal Start As String) As Integer
     Dim wsTOT As Worksheet, WorkerRow As Integer
     Set wsTOT = Worksheets("TOT")
     WorkerRow = Start + 1
-    While wsTOT.Cells(WorkerRow, 2).Value <> "IMPRESA1"
+    While wsTOT.Cells(WorkerRow, 2).Value <> ""
         If wsTOT.Cells(WorkerRow, 2).Value = WorkerName Then
             NameFound = WorkerRow
             Exit Function
@@ -101,8 +109,8 @@ Function Transfer_data(ByVal OldPos As Integer, ByVal NewPos As Integer)
     Dim wsTOT As Worksheet
     Dim wsFORM As Worksheet
 
-    Set wsTOT = Worksheets("TOT")
-    Set wsFORM = Worksheets("FORMAZIONE")
+    Set wsTOT = Worksheets("TOT-M")
+    Set wsFORM = Worksheets("FORMAZIONE-M")
 
     With wsTOT
         .Range(.Cells(OldPos, 35), .Cells(OldPos, 48)).Copy
@@ -123,39 +131,11 @@ Function Transfer_data(ByVal OldPos As Integer, ByVal NewPos As Integer)
     Application.CutCopyMode = False
 End Function
 
-Function Paint_Worker(ByVal Pos As Integer, ByVal Role As Integer)
-    Dim wsTOT As Worksheet
-    Dim wsFORM As Worksheet
-    Set wsTOT = Worksheets("TOT")
-    Set wsFORM = Worksheets("FORMAZIONE")
-
-    Dim color As Long
-    Select Case Role
-        Case 1: color = RGB(255, 242, 204)
-        Case 2: color = RGB(255, 255, 255)
-        Case 3: color = RGB(221, 235, 247)
-        Case 4: color = RGB(252, 228, 214)
-    End Select
-
-    With wsTOT
-        .Range(.Cells(Pos, 2), .Cells(Pos, 27)).Interior.color = color
-        .Range(.Cells(Pos, 29), .Cells(Pos, 30)).Interior.color = color
-        .Range(.Cells(Pos, 33), .Cells(Pos, 48)).Interior.color = color
-        .Range(.Cells(Pos, 53), .Cells(Pos, 67)).Interior.color = color
-    End With
-
-    With wsFORM
-        .Range(.Cells(Pos, 2), .Cells(Pos, 16)).Interior.color = color
-        .Range(.Cells(Pos, 19), .Cells(Pos, 55)).Interior.color = color
-        .Range(.Cells(Pos, 58), .Cells(Pos, 72)).Interior.color = color
-    End With
-End Function
-
-Function Check_Days(ByVal Worker As Integer, ByVal WorkerRole As Integer)
+Function Check_Days(ByVal Worker As Integer)
     Dim wsDip As Worksheet, wsTOT As Worksheet
     Dim LastRow As Integer, i As Integer
-    Set wsDip = Worksheets("Dipendenti")
-    Set wsTOT = Worksheets("TOT")
+    Set wsDip = Worksheets("Dipendenti-M")
+    Set wsTOT = Worksheets("TOT-M")
 
     For i = 10 To 16
         If wsDip.Cells(Worker, i).Value = "Si" And wsTOT.Cells(Worker + 1, 4 + (i - 10) * 2).Value <> "FERIE" Then
@@ -195,7 +175,6 @@ Function Check_Days(ByVal Worker As Integer, ByVal WorkerRole As Integer)
     ElseIf wsDip.Cells(Worker, 1).Value = "No" And wsTOT.Cells(Worker + 1, 1).Interior.color = RGB(241, 170, 131) Then
         wsTOT.Range(wsTOT.Cells(Worker + 2, 4), wsTOT.Cells(Worker + 2, 17)).Copy
         wsTOT.Range(wsTOT.Cells(Worker + 1, 4), wsTOT.Cells(Worker + 1, 17)).PasteSpecial xlPasteAll
-        Call Paint_Worker(Worker + 1, WorkerRole)
         wsTOT.Cells(Worker + 1, 1).Interior.color = RGB(255, 255, 255)
     End If
 End Function
@@ -206,25 +185,25 @@ Function Update_Validation()
     Dim LastRow As Long
     Dim addressList As String
     Dim rngValidazione As Range
-    
-    Set wsTOT = ThisWorkbook.Sheets("TOT")
-    
-    ' Trova l'ultima riga non vuota della colonna A nel foglio TOT
-    LastRow = 1
 
-    While wsTOT.Cells(LastRow, 2).Value <> "IMPRESA1" And LastRow < Rows.Count
+    Set wsTOT = ThisWorkbook.Sheets("TOT-M")
+
+    ' Trova l'ultima riga non vuota della colonna A nel foglio TOT
+    LastRow = 4
+
+    While wsTOT.Cells(LastRow, 2).Value <> "" And LastRow < Rows.Count
         LastRow = LastRow + 1
     Wend
     LastRow = LastRow + 3
     
     ' Costruisci l'indirizzo dell'intervallo da usare nella validazione
-    addressList = "=TOT!$B$4:$B$" & LastRow
-    
+    addressList = "='TOT-M'!$B$4:$B$" & LastRow
+
     ' Applica la convalida nei fogli dei giorni
     For Each ws In ThisWorkbook.Worksheets
-        If ws.name = "LUN" Or ws.name = "MAR" Or ws.name = "MER" Or _
-           ws.name = "GIO" Or ws.name = "VEN" Or ws.name = "SAB" Or ws.name = "DOM" Then
-            
+        If ws.name = "LUN-M" Or ws.name = "MAR-M" Or ws.name = "MER-M" Or _
+           ws.name = "GIO-M" Or ws.name = "VEN-M" Or ws.name = "SAB-M" Or ws.name = "DOM-M" Then
+
             Set rngValidazione = ws.Range("A16:A165") ' Adatta se necessario
             
             On Error Resume Next
@@ -245,7 +224,7 @@ End Function
 
 
 ' Aggiorna tutti i lavoratori dal foglio Dipendenti
-Sub Update_Workers()
+Sub Update_Workers_M()
     Call ShowSheets
 
     Update.Show vbModeless
@@ -259,31 +238,16 @@ Sub Update_Workers()
 
     Dim wsDip As Worksheet, wsTOT As Worksheet
     Dim Worker As Integer, WorkerName As String, WorkerName_Surname As String
-    Dim WorkerRole As Integer, WorkerContract As Integer, LastRow As Integer, WorkerPos As Integer
+    Dim WorkerContract As Integer, LastRow As Integer, WorkerPos As Integer
 
-    Set wsDip = Worksheets("Dipendenti")
-    Set wsTOT = Worksheets("TOT")
+    Set wsDip = Worksheets("Dipendenti-M")
+    Set wsTOT = Worksheets("TOT-M")
     Worker = 3
 
-    While wsDip.Cells(Worker, 3).Value <> ""
-        WorkerName = wsDip.Cells(Worker, 3).Value
-        WorkerName_Surname = wsDip.Cells(Worker, 4).Value
-        WorkerContract = wsDip.Cells(Worker, 5).Value
-
-        Select Case wsDip.Cells(Worker, 2).Value
-            Case "Gel": WorkerRole = 1
-            Case "Front": WorkerRole = 2
-            Case "Tutto": WorkerRole = 3
-            Case "Cucina": WorkerRole = 4
-        End Select
-
-        Dim color As Long
-        Select Case WorkerRole
-            Case 1: color = RGB(255, 242, 204)
-            Case 2: color = RGB(255, 255, 255)
-            Case 3: color = RGB(221, 235, 247)
-            Case 4: color = RGB(252, 228, 214)
-        End Select
+    While wsDip.Cells(Worker, 2).Value <> ""
+        WorkerName = wsDip.Cells(Worker, 2).Value
+        WorkerName_Surname = wsDip.Cells(Worker, 3).Value
+        WorkerContract = wsDip.Cells(Worker, 4).Value
 
         If NameFound(WorkerName, 3) <> -1 Then
             WorkerPos = NameFound(WorkerName, 3) - 3
@@ -291,25 +255,23 @@ Sub Update_Workers()
             wsTOT.Cells(WorkerPos + 3, 3).Value = WorkerName_Surname And _
             wsTOT.Cells(WorkerPos + 3, 27).Value = WorkerContract And _
             wsTOT.Cells(WorkerPos + 3, 2).Interior.color = color Then
-                Call Check_Days(Worker, WorkerRole)
+                Call Check_Days(Worker)
             Else
                 Call Add_Worker(WorkerName, WorkerName_Surname, WorkerContract, Worker - 2)
                 WorkerPos = NameFound(WorkerName, Worker + 1) - 3
                 Call Transfer_data(WorkerPos + 3, Worker + 1)
                 Call Delete_Worker(WorkerPos)
-                Call Check_Days(Worker, WorkerRole)
-                Call Paint_Worker(Worker + 1, WorkerRole)
+                Call Check_Days(Worker)
             End If
         Else
             Call Add_Worker(WorkerName, WorkerName_Surname, WorkerContract, Worker - 2)
-            Call Paint_Worker(Worker + 1, WorkerRole)
-            Call Check_Days(Worker, WorkerRole)
+            Call Check_Days(Worker)
         End If
         Worker = Worker + 1
     Wend
 
     LastRow = 4
-    While wsTOT.Cells(LastRow, 2).Value <> "IMPRESA1" And LastRow < Rows.Count
+    While wsTOT.Cells(LastRow, 2).Value <> "" And LastRow < Rows.Count
         LastRow = LastRow + 1
     Wend
 
@@ -333,7 +295,7 @@ Sub Update_Workers()
     MsgBox "Aggiornamento completato", vbInformation, "Aggiornamento lavoratori"
 End Sub
 
-Sub PrintRange()
+Sub PrintRange_M()
     Dim LastRow As Integer
     LastRow = 4
     While Cells(LastRow, 1) <> ""
