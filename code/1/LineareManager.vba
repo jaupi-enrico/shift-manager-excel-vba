@@ -169,10 +169,10 @@ Private Sub Worksheet_SelectionChange(ByVal Target As Range)
     Password = "Ej20082018*Excel"
     ' Definisci gli intervalli di celle
     ' che devono essere de-protetti
-    Set rngC = Range("C17:C164")
-    Set rngD = Range("D17:D164")
-    Set rngName = Range("A17:A164")
-    Set rngLines = Range("F16:BR165")
+    Set rngC = Range("C2:C151")
+    Set rngD = Range("D2:D151")
+    Set rngName = Range("A3:A151")
+    Set rngLines = Range("F2:BR151")
     On Error Resume Next
     ' Verifica se � stata selezionata una sola cella
     If Target.Cells.Count = 1 Then
