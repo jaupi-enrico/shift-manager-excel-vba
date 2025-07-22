@@ -24,13 +24,7 @@ Private Sub Workbook_BeforeClose(Cancel As Boolean)
                 sheet.name = "VEN" Or _
                 sheet.name = "SAB" Or _
                 sheet.name = "DOM" Or _
-                sheet.name = "LUN-M" Or _
-                sheet.name = "MAR-M" Or _
-                sheet.name = "MER-M" Or _
-                sheet.name = "GIO-M" Or _
-                sheet.name = "VEN-M" Or _
-                sheet.name = "SAB-M" Or _
-                sheet.name = "DOM-M" Then
+                sheet.name = "MANAGER" Then
                     sheet.Activate
                     ActiveWindow.FreezePanes = False
             End If
@@ -49,13 +43,7 @@ Private Sub Workbook_BeforeClose(Cancel As Boolean)
                     sheet.name = "VEN" Or _
                     sheet.name = "SAB" Or _
                     sheet.name = "DOM" Or _
-                    sheet.name = "LUN-M" Or _
-                    sheet.name = "MAR-M" Or _
-                    sheet.name = "MER-M" Or _
-                    sheet.name = "GIO-M" Or _
-                    sheet.name = "VEN-M" Or _
-                    sheet.name = "SAB-M" Or _
-                    sheet.name = "DOM-M" Then
+                    sheet.name = "MANAGER" Then
                         sheet.Activate
                         ActiveWindow.FreezePanes = False
                 End If
@@ -86,13 +74,7 @@ Private Sub Workbook_BeforeSave(ByVal SaveAsUI As Boolean, Cancel As Boolean)
                 sheet.name = "VEN" Or _
                 sheet.name = "SAB" Or _
                 sheet.name = "DOM" Or _
-                sheet.name = "LUN-M" Or _
-                sheet.name = "MAR-M" Or _
-                sheet.name = "MER-M" Or _
-                sheet.name = "GIO-M" Or _
-                sheet.name = "VEN-M" Or _
-                sheet.name = "SAB-M" Or _
-                sheet.name = "DOM-M" Then
+                sheet.name = "MANAGER" Then
                     sheet.Activate
                     ActiveWindow.FreezePanes = False
             End If
@@ -114,13 +96,7 @@ Private Sub Workbook_Open()
             sheet.name = "VEN" Or _
             sheet.name = "SAB" Or _
             sheet.name = "DOM" Or _
-            sheet.name = "LUN-M" Or _
-            sheet.name = "MAR-M" Or _
-            sheet.name = "MER-M" Or _
-            sheet.name = "GIO-M" Or _
-            sheet.name = "VEN-M" Or _
-            sheet.name = "SAB-M" Or _
-            sheet.name = "DOM-M" Then
+            sheet.name = "MANAGER" Then
                 sheet.Activate
                 Range("F16").Activate
                 ActiveWindow.FreezePanes = True
@@ -181,13 +157,7 @@ Private Sub Workbook_BeforePrint(Cancel As Boolean)
            sheet.name = "VEN" Or _
            sheet.name = "SAB" Or _
            sheet.name = "DOM" Or _
-           sheet.name = "LUN-M" Or _
-           sheet.name = "MAR-M" Or _
-           sheet.name = "MER-M" Or _
-           sheet.name = "GIO-M" Or _
-           sheet.name = "VEN-M" Or _
-           sheet.name = "SAB-M" Or _
-           sheet.name = "DOM-M" Then
+           sheet.name = "MANAGER" Then
             ' Prova a definire l'intervallo specifico sul foglio corrente
             On Error Resume Next
             Set names_range = sheet.Range("A17:A164")

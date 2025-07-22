@@ -102,13 +102,7 @@ Sub Delete_names()
                sheet.name = "VEN" Or _
                sheet.name = "SAB" Or _
                sheet.name = "DOM" Or _
-               sheet.name = "LUN-M" Or _
-               sheet.name = "MAR-M" Or _
-               sheet.name = "MER-M" Or _
-               sheet.name = "GIO-M" Or _
-               sheet.name = "VEN-M" Or _
-               sheet.name = "SAB-M" Or _
-               sheet.name = "DOM-M" Then
+               sheet.name = "MANAGER" Then
 
                 If Impresa = False Then
                     Set rngNames = sheet.Range("A17:A153")
@@ -197,13 +191,7 @@ Sub Show_Lines()
            sheet.name = "VEN" Or _
            sheet.name = "SAB" Or _
            sheet.name = "DOM" Or _
-           sheet.name = "LUN-M" Or _
-           sheet.name = "MAR-M" Or _
-           sheet.name = "MER-M" Or _
-           sheet.name = "GIO-M" Or _
-           sheet.name = "VEN-M" Or _
-           sheet.name = "SAB-M" Or _
-           sheet.name = "DOM-M" Then
+           sheet.name = "MANAGER" Then
 
             ' Prova a definire l'intervallo specifico sul foglio corrente
             On Error Resume Next
@@ -334,13 +322,7 @@ Sub Hide_Lines()
            sheet.name = "VEN" Or _
            sheet.name = "SAB" Or _
            sheet.name = "DOM" Or _
-           sheet.name = "LUN-M" Or _
-           sheet.name = "MAR-M" Or _
-           sheet.name = "MER-M" Or _
-           sheet.name = "GIO-M" Or _
-           sheet.name = "VEN-M" Or _
-           sheet.name = "SAB-M" Or _
-           sheet.name = "DOM-M" Then
+           sheet.name = "MANAGER" Then
 
             ' Prova a definire l'intervallo specifico sul foglio corrente
             On Error Resume Next

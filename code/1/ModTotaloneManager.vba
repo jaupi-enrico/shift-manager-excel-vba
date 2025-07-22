@@ -201,8 +201,7 @@ Function Update_Validation()
 
     ' Applica la convalida nei fogli dei giorni
     For Each ws In ThisWorkbook.Worksheets
-        If ws.name = "LUN-M" Or ws.name = "MAR-M" Or ws.name = "MER-M" Or _
-           ws.name = "GIO-M" Or ws.name = "VEN-M" Or ws.name = "SAB-M" Or ws.name = "DOM-M" Then
+        If ws.name = "MANAGER" Then
 
             Set rngValidazione = ws.Range("A16:A165") ' Adatta se necessario
             
