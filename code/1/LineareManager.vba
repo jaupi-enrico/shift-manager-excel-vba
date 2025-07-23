@@ -76,7 +76,7 @@ End Function
 
 Function CancelName(ByVal Target As Range)
     ' Cancella il nome se gi� presente in tutte le colonne
-    For Each cell In Range(Cells(OriginalRow - 1, 6), Cells(OriginalRow - 1, 70))
+    For Each cell In Range(Cells(OriginalRow - 1, 8), Cells(OriginalRow - 1, 72))
         If (cell.Value <> "" And cell.Value = Cells(OriginalRow, 1).Value) Or (Target.Column = 1 And cell.Value = content) Then
             cell.ClearContents
         End If
@@ -120,14 +120,14 @@ End Function
 
 Function Find_Column_I_F()
     ' Trova la posizione delle colonne "I" e "F" nella OriginalRow
-    For Each cell In Range(Cells(OriginalRow, 6), Cells(OriginalRow, 70))
+    For Each cell In Range(Cells(OriginalRow, 8), Cells(OriginalRow, 72))
         If cell.Value = "I" Then
             columnI = cell.Column
             Exit For
         End If
     Next cell
-    
-    For Each cell In Range(Cells(OriginalRow, 6), Cells(OriginalRow, 70))
+
+    For Each cell In Range(Cells(OriginalRow, 8), Cells(OriginalRow, 72))
         If cell.Value = "F" Then
             columnF = cell.Column
             Exit For
@@ -151,7 +151,7 @@ Function TextChange(ByVal Target As Range)
     ' Se il valore della cella � vuoto
     If Target.Value = "" Then
         ' Ripristina il formato della cella
-        If (Target.Column <= 30 And Target.Column >= 22) Or (Target.Column <= 49 And Target.Column >= 41) Then
+        If (Target.Column <= 32 And Target.Column >= 24) Or (Target.Column <= 51 And Target.Column >= 43) Then
             ' Colonne di rush
             Target.Interior.color = RGB(217, 217, 217)
         Else
@@ -169,10 +169,12 @@ Private Sub Worksheet_SelectionChange(ByVal Target As Range)
     Password = "Ej20082018*Excel"
     ' Definisci gli intervalli di celle
     ' che devono essere de-protetti
-    Set rngC = Range("C2:C151")
-    Set rngD = Range("D2:D151")
-    Set rngName = Range("A3:A151")
-    Set rngLines = Range("F2:BR151")
+    Set rngC = Range("C2:C148")
+    Set rngD = Range("D2:D148")
+    Set rngName = Range("A3:A148")
+    Set rngLines = Range("H2:BT148")
+    Set rngDiff = Range("B2:B148")
+    Set rngResp = Range("F2:G148")
     On Error Resume Next
     ' Verifica se � stata selezionata una sola cella
     If Target.Cells.Count = 1 Then
@@ -186,9 +188,11 @@ Private Sub Worksheet_SelectionChange(ByVal Target As Range)
     If ActiveWindow.SelectedSheets.Count = 1 Then
         ' Controlla se la cella selezionata � all'interno di uno degli intervalli specificati
         ' Se � cos�, de-protegge il foglio
-        If Not Intersect(Target, rngC) Is Nothing Or Not Intersect(Target, rngD) Is Nothing _
+        If Not Intersect(Target, rngDiff) Is Nothing Then
+            ActiveSheet.Protect Password:=Password
+        ElseIf Not Intersect(Target, rngC) Is Nothing Or Not Intersect(Target, rngD) Is Nothing _
         Or Not Intersect(Target, rngName) Is Nothing Or Not Intersect(Target, rngLines) Is Nothing _
-        Or Not Intersect(Target, Range("AN152")) Is Nothing Or Not Intersect(Target, Range("A1")) Is Nothing Then
+        Or Not Intersect(Target, rngResp) Is Nothing Or Not Intersect(Target, Range("AQ149")) Is Nothing Then
             ActiveSheet.Unprotect Password:=Password
         Else
             ' Altrimenti, protegge il foglio
@@ -210,11 +214,12 @@ Private Sub Worksheet_Change(ByVal Target As Range)
     
     ' Definisci gli intervalli di celle
     ' che devono essere monitorati per le modifiche
-    Set rngC = Range("C2:C151")
-    Set rngD = Range("D2:D151")
-    Set rngName = Range("A3:A151")
-    Set rngLines = Range("F2:BR151")
-    Set rngDiff = Range("B2:B151")
+    Set rngC = Range("C2:C148")
+    Set rngD = Range("D2:D148")
+    Set rngName = Range("A3:A148")
+    Set rngLines = Range("H2:BT148")
+    Set rngDiff = Range("B2:B148")
+    Set rngResp = Range("F2:G148")
 
     ' Non togliere questa parte, serve per evitare errori
     ' per il men� a tendina.
@@ -282,7 +287,7 @@ Private Sub Worksheet_Change(ByVal Target As Range)
 
         GoTo TextChange
     Else
-        If Not Intersect(Target, Range("AN152")) Is Nothing Or Not Intersect(Target, Range("A1")) Is Nothing Then
+        If Not Intersect(Target, Range("AQ149")) Is Nothing Or Not Intersect(Target, rngResp) Is Nothing Then
             With Target
                 .HorizontalAlignment = xlCenter
                 .VerticalAlignment = xlCenter
@@ -298,11 +303,11 @@ Private Sub Worksheet_Change(ByVal Target As Range)
     If Not IsError(Application.Evaluate(content)) Then
         Target.Formula = content
     Else
-        MsgBox "Errore: La formula salvata non � valida."
+        MsgBox "Errore: La formula salvata non e' valida."
     End If
 
     ' Definisci l'intervallo in cui vuoi cercare (ad esempio, la riga 1)
-    Set Times = Range("F1:BR1")
+    Set Times = Range("H1:BT1")
 
     ColumnFound = 0 ' Inizializza la colonna trovata a 0
 
@@ -312,17 +317,17 @@ Private Sub Worksheet_Change(ByVal Target As Range)
         If orario = "6:00" Then
             Answer = MsgBox("Le 6:00 di mattina?", vbYesNo + vbQuestion + vbDefaultButton1)
             If Answer = vbYes Then
-                ColumnFound = 7
+                ColumnFound = 9
             Else
-                ColumnFound = 69
+                ColumnFound = 71
             End If
             Exit For
         ElseIf orario = "6:30" Then
             Answer = MsgBox("Le 6:30 di mattina?", vbYesNo + vbQuestion + vbDefaultButton1)
             If Answer = vbYes Then
-                ColumnFound = 9
+                ColumnFound = 11
             Else
-                ColumnFound = 70
+                ColumnFound = 72
             End If
             Exit For
         End If
@@ -353,7 +358,7 @@ Private Sub Worksheet_Change(ByVal Target As Range)
     ' Trova la posizione delle colonne "I" e "F" nella OriginalRow
     If rangeName = "I" Then
         columnI = ColumnFound
-        For Each cell In Range(Cells(OriginalRow, 6), Cells(OriginalRow, 70))
+        For Each cell In Range(Cells(OriginalRow, 8), Cells(OriginalRow, 72))
             If cell.Value = "F" Then
                 columnF = cell.Column
                 Exit For
@@ -361,7 +366,7 @@ Private Sub Worksheet_Change(ByVal Target As Range)
         Next cell
     ElseIf rangeName = "F" Then
         columnF = ColumnFound
-        For Each cell In Range(Cells(OriginalRow, 6), Cells(OriginalRow, 70))
+        For Each cell In Range(Cells(OriginalRow, 8), Cells(OriginalRow, 72))
             If cell.Value = "I" Then
                 columnI = cell.Column
                 Exit For
@@ -370,9 +375,9 @@ Private Sub Worksheet_Change(ByVal Target As Range)
     Else
         Call Find_Column_I_F
     End If
-    
-    ' Elimina i valori dalla colonna "F" alla colonna "BR" per la OriginalRow
-    Range(Cells(OriginalRow, Columns("F").Column), Cells(OriginalRow, Columns("BR").Column)).ClearContents
+
+    ' Elimina i valori dalla colonna "F" alla colonna "BT" per la OriginalRow
+    Range(Cells(OriginalRow, Columns("H").Column), Cells(OriginalRow, Columns("BT").Column)).ClearContents
 
     ' Ripristina "I" e "F" nelle loro posizioni originali
     If columnI > 0 Then Cells(OriginalRow, columnI).Value = "I"
@@ -389,7 +394,7 @@ Private Sub Worksheet_Change(ByVal Target As Range)
     
     ' Errore se la collona di I � maggiore della colonna di F
     If columnI > 0 And columnF > 0 And columnI > columnF Then
-        MsgBox "Errore: L'ora di inizio � dopo quella di fine.", vbRetryCancel + vbCritical
+        MsgBox "Errore: L'ora di inizio e' dopo quella di fine.", vbRetryCancel + vbCritical
         ' Cancella il nome se gi� presente
         Call CancelName(Target)
         Cells(OriginalRow, columnF).Value = ""
@@ -448,7 +453,7 @@ Pause:
                 .Font.Bold = True
                 .Font.Size = 36
             End With
-            If (Target.Column <= 30 And Target.Column >= 22) Or (Target.Column <= 49 And Target.Column >= 41) Then
+            If (Target.Column <= 32 And Target.Column >= 24) Or (Target.Column <= 51 And Target.Column >= 43) Then
                 ' Colonne di rush
                 Target.Interior.color = RGB(217, 217, 217)
             Else
@@ -499,19 +504,28 @@ Pause:
         MsgBox "Errore nel blocco pausa."
     End If
 
-    ' Se il nome � presente allora gestisci il cambio di posizione del nome
+    ' Se il nome e' presente allora gestisci il cambio di posizione del nome
     If Cells(OriginalRow, 1).Value <> "" Then
         GoTo NameChange
     End If
 
 NameChange:
 
-    ' Se il flag CheckName � attivo ed � presente un nome
-    ' controlla se il nome � gi� presente in un'altra cella
+    ' Se il flag CheckName e' attivo ed e' presente un nome
+    ' controlla se il nome e' gia' presente in un'altra cella
     If CheckName And Cells(OriginalRow, 1).Value <> "" Then
-        For Each cell In Range(Cells(16, 1), Cells(165, 1))
+        Dim startRow As Long, endRow As Long
+        Dim blockIndex As Long
+        Dim cell As Range
+        
+        ' Calcola in quale blocco da 21 righe si trova OriginalRow (partendo da riga 2)
+        blockIndex = Int((OriginalRow - 2) / 21)
+        startRow = 2 + blockIndex * 21
+        endRow = startRow + 20 ' 21 righe
+        
+        For Each cell In Range(Cells(startRow, 1), Cells(endRow, 1))
             If cell.Value = Cells(OriginalRow, 1).Value And cell.Address <> Cells(OriginalRow, 1).Address Then
-                AnswerQuestion = MsgBox("Nome gia' inserito", vbCritical + vbRetryCancel + vbDefaultButton1)
+                AnswerQuestion = MsgBox("Nome già inserito", vbCritical + vbRetryCancel + vbDefaultButton1)
                 If AnswerQuestion = vbRetry Then
                     Cells(OriginalRow, 1).ClearContents
                 End If
@@ -519,6 +533,7 @@ NameChange:
             End If
         Next cell
     End If
+
     
     Call Find_Column_I_F
     
@@ -530,7 +545,7 @@ NameChange:
     
     ' Controlla se e' stato modificato il nome di un altra riga
     ' in caso di modifica, aggiorna la riga originale e ripeti il processo
-    If OriginalRow < 151 And Cells(OriginalRow + 2, 1).Interior.color <> RGB(255, 255, 255) Then
+    If OriginalRow < 148 And Cells(OriginalRow + 2, 1).Interior.color <> RGB(255, 255, 255) Then
         OriginalRow = OriginalRow + 2
         Find_Column_I_F
         If columnF > 0 And columnI > 0 Then
