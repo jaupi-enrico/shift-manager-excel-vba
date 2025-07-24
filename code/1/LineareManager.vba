@@ -6,7 +6,7 @@ Dim orario As String
 Dim columnI As Integer
 Dim columnF As Integer
 Dim Column As Integer
-Dim rngC As Range, rngD As Range, rngName As Range, rngLines As Range, rngDiff As Range
+Dim rngC As Range, rngD As Range, rngName As Range, rngLines As Range, rngDiff As Range, rngResp As Range
 Dim Times As Range
 Dim Time As Range
 Dim ColumnFound As Integer
@@ -516,7 +516,6 @@ NameChange:
     If CheckName And Cells(OriginalRow, 1).Value <> "" Then
         Dim startRow As Long, endRow As Long
         Dim blockIndex As Long
-        Dim cell As Range
         
         ' Calcola in quale blocco da 21 righe si trova OriginalRow (partendo da riga 2)
         blockIndex = Int((OriginalRow - 2) / 21)
