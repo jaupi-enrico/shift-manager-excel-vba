@@ -328,7 +328,7 @@ Sub Show_Lines()
             End If
         ElseIf sheet.name = "MANAGER" Then
             On Error Resume Next
-            Set rngNames = sheet.Range("A3:A147")
+            Set names_range = sheet.Range("A3:A147")
             On Error GoTo ErrorHandler
 
             If Not names_range Is Nothing Then
