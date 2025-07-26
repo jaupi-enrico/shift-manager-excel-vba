@@ -173,6 +173,7 @@ Private Sub Worksheet_SelectionChange(ByVal Target As Range)
     Set rngD = Range("D17:D164")
     Set rngName = Range("A17:A164")
     Set rngLines = Range("F16:BR165")
+    Set rngDiff = Range("B16:B165")
     On Error Resume Next
     ' Verifica se � stata selezionata una sola cella
     If Target.Cells.Count = 1 Then
@@ -186,7 +187,10 @@ Private Sub Worksheet_SelectionChange(ByVal Target As Range)
     If ActiveWindow.SelectedSheets.Count = 1 Then
         ' Controlla se la cella selezionata � all'interno di uno degli intervalli specificati
         ' Se � cos�, de-protegge il foglio
-        If Not Intersect(Target, rngC) Is Nothing Or Not Intersect(Target, rngD) Is Nothing _
+        If Not Intersect(Target, rngDiff) Is Nothing Then
+            ActiveSheet.Protect Password:=Password
+            ActiveSheet.Cells(Target.Row, Target.Column - 1).Activate
+        ElseIf Not Intersect(Target, rngC) Is Nothing Or Not Intersect(Target, rngD) Is Nothing _
         Or Not Intersect(Target, rngName) Is Nothing Or Not Intersect(Target, rngLines) Is Nothing _
         Or Not Intersect(Target, Range("AN170")) Is Nothing Or Not Intersect(Target, Range("A1")) Is Nothing Then
             ActiveSheet.Unprotect Password:=Password
@@ -574,3 +578,6 @@ Cleanup:
     Exit Sub
     
 End Sub
+
+
+

@@ -239,7 +239,11 @@ Sub Check_Days(ByVal Worker As Integer, ByVal WorkerRole As Integer)
     If wsDip.Cells(Worker, 1).Value = "Si" Then
         wsTOT.Cells(Worker + 1, 1).Interior.color = RGB(241, 170, 131)
     ElseIf wsDip.Cells(Worker, 1).Value = "No" And wsTOT.Cells(Worker + 1, 1).Interior.color = RGB(241, 170, 131) Then
-        wsTOT.Range(wsTOT.Cells(Worker + 2, 4), wsTOT.Cells(Worker + 2, 17)).Copy
+        rigaValida = 4
+        While wsTOT.Cells(rigaValida, 1).Interior.color = RGB(241, 170, 131) And rigaValida <= LastRowMax
+            rigaValida = rigaValida + 1
+        Wend
+        wsTOT.Range(wsTOT.Cells(rigaValida, 4), wsTOT.Cells(Worker + 2, 17)).Copy
         wsTOT.Range(wsTOT.Cells(Worker + 1, 4), wsTOT.Cells(Worker + 1, 17)).PasteSpecial xlPasteAll
         Call Paint_Worker(Worker + 1, WorkerRole)
         wsTOT.Cells(Worker + 1, 1).Interior.color = RGB(255, 255, 255)

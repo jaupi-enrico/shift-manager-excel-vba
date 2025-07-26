@@ -190,6 +190,7 @@ Private Sub Worksheet_SelectionChange(ByVal Target As Range)
         ' Se � cos�, de-protegge il foglio
         If Not Intersect(Target, rngDiff) Is Nothing Then
             ActiveSheet.Protect Password:=Password
+            ActiveSheet.Cells(Target.Row, Target.Column - 1).Activate
         ElseIf Not Intersect(Target, rngC) Is Nothing Or Not Intersect(Target, rngD) Is Nothing _
         Or Not Intersect(Target, rngName) Is Nothing Or Not Intersect(Target, rngLines) Is Nothing _
         Or Not Intersect(Target, rngResp) Is Nothing Or Not Intersect(Target, Range("AQ149")) Is Nothing Then
