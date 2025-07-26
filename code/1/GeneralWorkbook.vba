@@ -1,9 +1,10 @@
 Option Explicit
-    Dim sheet As Worksheet ' Dichiarazione variabile sheet
-    Dim Answer As Long ' Dichiarazione variabile Answer
-    Dim Closing As Boolean ' Dichiarazione variabile Closing
-    Dim Changed As Boolean
-    Dim ChangedAfterSave As Boolean
+
+Dim sheet As Worksheet ' Dichiarazione variabile sheet
+Dim Answer As Long ' Dichiarazione variabile Answer
+Dim Closing As Boolean ' Dichiarazione variabile Closing
+Dim Changed As Boolean
+Dim ChangedAfterSave As Boolean
 
 
 Private Sub Workbook_BeforeClose(Cancel As Boolean)
@@ -100,6 +101,7 @@ Private Sub Workbook_Open()
                 Range("F16").Activate
                 ActiveWindow.FreezePanes = True
         ElseIf sheet.name = "MANAGER" Then
+            sheet.Activate
             Range("F2").Activate
             ActiveWindow.FreezePanes = True
         End If
