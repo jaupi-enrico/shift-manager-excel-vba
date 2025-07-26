@@ -86,6 +86,7 @@ Private Sub Workbook_BeforeSave(ByVal SaveAsUI As Boolean, Cancel As Boolean)
 End Sub
 
 Private Sub Workbook_Open()
+    On Error Resume Next
     Dim Password As String
     Password = "Ej20082018*Excel"
     For Each sheet In Worksheets
@@ -109,6 +110,7 @@ Private Sub Workbook_Open()
     Worksheets(1).Activate
     Call AggiornaCodiceVBA
     Call ApplyChanges
+    On Error GoTo 0
 End Sub
 
 Private Sub Workbook_SheetActivate(ByVal Sh As Object)
