@@ -91,15 +91,15 @@ End Sub
 
 ' Trova un nome nella colonna 2 del foglio TOT a partire da una riga specifica
 Function NameFound(ByVal WorkerName As String, ByVal Start As String) As Integer
-    Dim wsTOT As Worksheet, workerRow As Integer
+    Dim wsTOT As Worksheet, WorkerRow As Integer
     Set wsTOT = Worksheets("TOT")
-    workerRow = Start + 1
-    While wsTOT.Cells(workerRow, 2).Value <> ""
-        If wsTOT.Cells(workerRow, 2).Value = WorkerName Then
-            NameFound = workerRow
+    WorkerRow = Start + 1
+    While wsTOT.Cells(WorkerRow, 2).Value <> ""
+        If wsTOT.Cells(WorkerRow, 2).Value = WorkerName Then
+            NameFound = WorkerRow
             Exit Function
         End If
-        workerRow = workerRow + 1
+        WorkerRow = WorkerRow + 1
     Wend
     NameFound = -1
 End Function
@@ -174,8 +174,8 @@ Sub Check_Days(ByVal Worker As Integer)
     LastRowMax = LastRowMax - 1
 
     ' FERIE (colonne 10–16)
-    For i = 9 To 15
-        colOffset = 4 + (i - 9) * 2
+    For i = 10 To 16
+        colOffset = 4 + (i - 10) * 2
         label = "FERIE"
 
         If wsDip.Cells(Worker, i).Value = "Si" And wsTOT.Cells(Worker + 1, colOffset).Value <> label Then
@@ -194,8 +194,8 @@ Sub Check_Days(ByVal Worker As Integer)
     Next i
 
     ' MALATTIA (colonne 18–24)
-    For i = 17 To 23
-        colOffset = 4 + (i - 17) * 2
+    For i = 18 To 24
+        colOffset = 4 + (i - 18) * 2
         label = "MALATTIA"
 
         If wsDip.Cells(Worker, i).Value = "Si" And wsTOT.Cells(Worker + 1, colOffset).Value <> label Then
@@ -214,8 +214,8 @@ Sub Check_Days(ByVal Worker As Integer)
     Next i
 
     ' CORSO (colonne 26–32)
-    For i = 25 To 31
-        colOffset = 4 + (i - 25) * 2
+    For i = 26 To 32
+        colOffset = 4 + (i - 26) * 2
         label = "CORSO"
 
         If wsDip.Cells(Worker, i).Value = "Si" And wsTOT.Cells(Worker + 1, colOffset).Value <> label Then
@@ -235,9 +235,9 @@ Sub Check_Days(ByVal Worker As Integer)
 
     ' Colore intestazione
     If wsDip.Cells(Worker, 1).Value = "Si" Then
-        wsTOT.Cells(Worker + 1, 1).Interior.color = RGB(241, 170, 131)
-    ElseIf wsDip.Cells(Worker, 1).Value = "No" And wsTOT.Cells(Worker + 1, 1).Interior.color = RGB(241, 170, 131) Then
-        wsTOT.Cells(Worker + 1, 1).Interior.color = RGB(255, 255, 255)
+        wsTOT.Cells(Worker + 1, 1).Interior.Color = RGB(241, 170, 131)
+    ElseIf wsDip.Cells(Worker, 1).Value = "No" And wsTOT.Cells(Worker + 1, 1).Interior.Color = RGB(241, 170, 131) Then
+        wsTOT.Cells(Worker + 1, 1).Interior.Color = RGB(255, 255, 255)
         ' Puoi aggiungere copia da riga valida anche qui se serve
     End If
 End Sub
