@@ -141,14 +141,12 @@ Sub Delete_names()
                         sheet.Cells(OriginalRow, 1).Interior.color = RGB(217, 217, 217)
                     End If
                     
-                    If columnI > 0 And columnF > 0 Then
-                        ' Cancella contenuti se necessario
-                        For Each cell In sheet.Range(sheet.Cells(OriginalRow - 1, columnI), sheet.Cells(OriginalRow - 1, columnF))
-                            If cell.Value <> "" And cell.Value = content Then
-                                cell.ClearContents
-                            End If
-                        Next cell
-                    End If
+                    ' Cancella contenuti se necessario
+                    For Each cell In sheet.Range(sheet.Cells(OriginalRow - 1, columnI), sheet.Cells(OriginalRow - 1, columnF))
+                        If cell.Value <> "" And cell.Value = content Then
+                            cell.ClearContents
+                        End If
+                    Next cell
                     End If
                 Next name
             ElseIf sheet.name = "MANAGER" Then
@@ -196,7 +194,7 @@ Sub Delete_names()
                 Next name
             End If
         Next sheet
-    End If
+    End if
 Cleanup:
         
     columnF = 0
