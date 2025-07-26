@@ -159,83 +159,45 @@ Function Paint_Worker(ByVal Pos As Integer, ByVal Role As Integer)
     End With
 End Function
 
-Sub Check_Days(ByVal Worker As Integer, ByVal WorkerRole As Integer)
+Function Check_Days(ByVal Worker As Integer, ByVal WorkerRole As Integer)
     Dim wsDip As Worksheet, wsTOT As Worksheet
-    Dim i As Integer, colOffset As Integer
-    Dim label As String, rigaValida As Integer
-    Dim LastRowMax As Integer
-
+    Dim LastRow As Integer, i As Integer
     Set wsDip = Worksheets("Dipendenti")
     Set wsTOT = Worksheets("TOT")
 
-    ' Trova l'ultima riga non vuota della colonna A nel foglio TOT
-    LastRowMax = 4
-    While wsTOT.Cells(LastRowMax, 1).Value <> "" And LastRowMax < Rows.Count
-        LastRowMax = LastRowMax + 1
-    Wend
-    LastRowMax = LastRowMax - 1
-
-    ' FERIE (colonne 10–16)
     For i = 10 To 16
-        colOffset = 4 + (i - 10) * 2
-        label = "FERIE"
-
-        If wsDip.Cells(Worker, i).Value = "Si" And wsTOT.Cells(Worker + 1, colOffset).Value <> label Then
-            wsTOT.Range(wsTOT.Cells(Worker + 1, colOffset), wsTOT.Cells(Worker + 1, colOffset + 1)).Merge
-            wsTOT.Cells(Worker + 1, colOffset).Value = label
-
-        ElseIf wsDip.Cells(Worker, i).Value = "No" And wsTOT.Cells(Worker + 1, colOffset).Value = label Then
-            wsTOT.Range(wsTOT.Cells(Worker + 1, colOffset), wsTOT.Cells(Worker + 1, colOffset + 1)).UnMerge
-
-            rigaValida = TrovaRigaValida(wsTOT, colOffset, Worker + 1, LastRowMax)
-            If rigaValida <> -1 Then
-                wsTOT.Range(wsTOT.Cells(rigaValida, colOffset), wsTOT.Cells(rigaValida, colOffset + 1)).Copy
-                wsTOT.Range(wsTOT.Cells(Worker + 1, colOffset), wsTOT.Cells(Worker + 1, colOffset + 1)).PasteSpecial xlPasteAll
-            End If
+        If wsDip.Cells(Worker, i).Value = "Si" And wsTOT.Cells(Worker + 1, 4 + (i - 10) * 2).Value <> "FERIE" Then
+            wsTOT.Range(wsTOT.Cells(Worker + 1, 4 + (i - 10) * 2), wsTOT.Cells(Worker + 1, 5 + (i - 10) * 2)).Merge
+            wsTOT.Cells(Worker + 1, 4 + (i - 10) * 2).Value = "FERIE"
+        ElseIf wsDip.Cells(Worker, i).Value = "No" And wsTOT.Cells(Worker + 1, 4 + (i - 10) * 2).Value = "FERIE" Then
+            wsTOT.Range(wsTOT.Cells(Worker + 1, 4 + (i - 10) * 2), wsTOT.Cells(Worker + 1, 5 + (i - 10) * 2)).UnMerge
+            wsTOT.Range(wsTOT.Cells(Worker + 2, 4 + (i - 10) * 2), wsTOT.Cells(Worker + 2, 5 + (i - 10) * 2)).Copy
+            wsTOT.Range(wsTOT.Cells(Worker + 1, 4 + (i - 10) * 2), wsTOT.Cells(Worker + 1, 5 + (i - 10) * 2)).PasteSpecial Paste:=xlPasteAll
         End If
     Next i
 
-    ' MALATTIA (colonne 18–24)
     For i = 18 To 24
-        colOffset = 4 + (i - 18) * 2
-        label = "MALATTIA"
-
-        If wsDip.Cells(Worker, i).Value = "Si" And wsTOT.Cells(Worker + 1, colOffset).Value <> label Then
-            wsTOT.Range(wsTOT.Cells(Worker + 1, colOffset), wsTOT.Cells(Worker + 1, colOffset + 1)).Merge
-            wsTOT.Cells(Worker + 1, colOffset).Value = label
-
-        ElseIf wsDip.Cells(Worker, i).Value = "No" And wsTOT.Cells(Worker + 1, colOffset).Value = label Then
-            wsTOT.Range(wsTOT.Cells(Worker + 1, colOffset), wsTOT.Cells(Worker + 1, colOffset + 1)).UnMerge
-
-            rigaValida = TrovaRigaValida(wsTOT, colOffset, Worker + 1, LastRowMax)
-            If rigaValida <> -1 Then
-                wsTOT.Range(wsTOT.Cells(rigaValida, colOffset), wsTOT.Cells(rigaValida, colOffset + 1)).Copy
-                wsTOT.Range(wsTOT.Cells(Worker + 1, colOffset), wsTOT.Cells(Worker + 1, colOffset + 1)).PasteSpecial xlPasteAll
-            End If
+        If wsDip.Cells(Worker, i).Value = "Si" And wsTOT.Cells(Worker + 1, 4 + (i - 18) * 2).Value <> "MALATTIA" Then
+            wsTOT.Range(wsTOT.Cells(Worker + 1, 4 + (i - 18) * 2), wsTOT.Cells(Worker + 1, 5 + (i - 18) * 2)).Merge
+            wsTOT.Cells(Worker + 1, 4 + (i - 18) * 2).Value = "MALATTIA"
+        ElseIf wsDip.Cells(Worker, i).Value = "No" And wsTOT.Cells(Worker + 1, 4 + (i - 18) * 2).Value = "MALATTIA" Then
+            wsTOT.Range(wsTOT.Cells(Worker + 1, 4 + (i - 18) * 2), wsTOT.Cells(Worker + 1, 5 + (i - 18) * 2)).UnMerge
+            wsTOT.Range(wsTOT.Cells(Worker + 2, 4 + (i - 18) * 2), wsTOT.Cells(Worker + 2, 5 + (i - 18) * 2)).Copy
+            wsTOT.Range(wsTOT.Cells(Worker + 1, 4 + (i - 18) * 2), wsTOT.Cells(Worker + 1, 5 + (i - 18) * 2)).PasteSpecial Paste:=xlPasteAll
         End If
     Next i
 
-    ' CORSO (colonne 26–32)
     For i = 26 To 32
-        colOffset = 4 + (i - 26) * 2
-        label = "CORSO"
-
-        If wsDip.Cells(Worker, i).Value = "Si" And wsTOT.Cells(Worker + 1, colOffset).Value <> label Then
-            wsTOT.Range(wsTOT.Cells(Worker + 1, colOffset), wsTOT.Cells(Worker + 1, colOffset + 1)).Merge
-            wsTOT.Cells(Worker + 1, colOffset).Value = label
-
-        ElseIf wsDip.Cells(Worker, i).Value = "No" And wsTOT.Cells(Worker + 1, colOffset).Value = label Then
-            wsTOT.Range(wsTOT.Cells(Worker + 1, colOffset), wsTOT.Cells(Worker + 1, colOffset + 1)).UnMerge
-
-            rigaValida = TrovaRigaValida(wsTOT, colOffset, Worker + 1, LastRowMax)
-            If rigaValida <> -1 Then
-                wsTOT.Range(wsTOT.Cells(rigaValida, colOffset), wsTOT.Cells(rigaValida, colOffset + 1)).Copy
-                wsTOT.Range(wsTOT.Cells(Worker + 1, colOffset), wsTOT.Cells(Worker + 1, colOffset + 1)).PasteSpecial xlPasteAll
-            End If
+        If wsDip.Cells(Worker, i).Value = "Si" And wsTOT.Cells(Worker + 1, 4 + (i - 26) * 2).Value <> "CORSO" Then
+            wsTOT.Range(wsTOT.Cells(Worker + 1, 4 + (i - 26) * 2), wsTOT.Cells(Worker + 1, 5 + (i - 26) * 2)).Merge
+            wsTOT.Cells(Worker + 1, 4 + (i - 26) * 2).Value = "CORSO"
+        ElseIf wsDip.Cells(Worker, i).Value = "No" And wsTOT.Cells(Worker + 1, 4 + (i - 26) * 2).Value = "CORSO" Then
+            wsTOT.Range(wsTOT.Cells(Worker + 1, 4 + (i - 26) * 2), wsTOT.Cells(Worker + 1, 5 + (i - 26) * 2)).UnMerge
+            wsTOT.Range(wsTOT.Cells(Worker + 2, 4 + (i - 26) * 2), wsTOT.Cells(Worker + 2, 5 + (i - 26) * 2)).Copy
+            wsTOT.Range(wsTOT.Cells(Worker + 1, 4 + (i - 26) * 2), wsTOT.Cells(Worker + 1, 5 + (i - 26) * 2)).PasteSpecial Paste:=xlPasteAll
         End If
     Next i
 
-    ' Colore intestazione
     If wsDip.Cells(Worker, 1).Value = "Si" Then
         wsTOT.Cells(Worker + 1, 1).Interior.color = RGB(241, 170, 131)
     ElseIf wsDip.Cells(Worker, 1).Value = "No" And wsTOT.Cells(Worker + 1, 1).Interior.color = RGB(241, 170, 131) Then
@@ -244,7 +206,7 @@ Sub Check_Days(ByVal Worker As Integer, ByVal WorkerRole As Integer)
         Call Paint_Worker(Worker + 1, WorkerRole)
         wsTOT.Cells(Worker + 1, 1).Interior.color = RGB(255, 255, 255)
     End If
-End Sub
+End Function
 
 Function Update_Validation()
     Dim ws As Worksheet
