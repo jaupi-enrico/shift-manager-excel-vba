@@ -1,5 +1,5 @@
 Option Explicit
 
-Private Sub ApplyChanges()
+Sub ApplyChanges()
     Debug.Print "test"
 End Sub
