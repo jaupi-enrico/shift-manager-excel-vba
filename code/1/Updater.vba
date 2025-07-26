@@ -13,6 +13,7 @@ Sub AggiornaCodiceVBA()
     Dim URL As String
     Dim NuovoCodice As String
     Dim Updated As Boolean
+    Dim tipo As Integer
     
     Updated = False
     
@@ -23,9 +24,9 @@ Sub AggiornaCodiceVBA()
     For Each vbComp In vbProj.VBComponents
         ' Nome del modulo corrente
         ModuloNome = vbComp.name
-        
+        tipo = Worksheets("Tabelle").Range("H9").Value
         ' URL del file su GitHub (ora .vba)
-        URL = "https://raw.githubusercontent.com/jaupi-enrico/shift-manager-excel-vba/main/code/1/" & ModuloNome & ".vba"
+        URL = "https://raw.githubusercontent.com/jaupi-enrico/shift-manager-excel-vba/main/code/" & tipo & "/" & ModuloNome & ".vba"
         
         ' Scarica il file
         Set Http = CreateObject("MSXML2.XMLHTTP")
