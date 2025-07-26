@@ -8,6 +8,7 @@ Dim ChangedAfterSave As Boolean
 
 
 Private Sub Workbook_BeforeClose(Cancel As Boolean)
+    Call Changes.ApplyChanges
     Changed = False
     Answer = MsgBox("Vuoi salvare?", vbYesNoCancel + vbQuestion + vbDefaultButton1)
     Dim Password As String
@@ -109,7 +110,6 @@ Private Sub Workbook_Open()
     Next sheet
     Worksheets(1).Activate
     Call AggiornaCodiceVBA
-    Call ApplyChanges
     On Error GoTo 0
 End Sub
 
