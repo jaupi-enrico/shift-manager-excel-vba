@@ -7,6 +7,7 @@ Dim columnI As Integer
 Dim columnF As Integer
 Dim Column As Integer
 Dim rngC As Range, rngD As Range, rngName As Range, rngLines As Range, rngDiff As Range
+Dim rngE As Range
 Dim Times As Range
 Dim Time As Range
 Dim ColumnFound As Integer
@@ -174,6 +175,7 @@ Private Sub Worksheet_SelectionChange(ByVal Target As Range)
     Set rngName = Range("A17:A164")
     Set rngLines = Range("F16:BR165")
     Set rngDiff = Range("B16:B165")
+    Set rngE = Range("E16:E165")
     On Error Resume Next
     ' Verifica se � stata selezionata una sola cella
     If Target.Cells.Count = 1 Then
@@ -188,6 +190,9 @@ Private Sub Worksheet_SelectionChange(ByVal Target As Range)
         ' Controlla se la cella selezionata � all'interno di uno degli intervalli specificati
         ' Se � cos�, de-protegge il foglio
         If Not Intersect(Target, rngDiff) Is Nothing Then
+            ActiveSheet.Protect Password:=Password
+            ActiveSheet.Cells(Target.Row, Target.Column - 1).Activate
+        ElseIf Not Intersect(Target, rngE) Is Nothing Then
             ActiveSheet.Protect Password:=Password
             ActiveSheet.Cells(Target.Row, Target.Column - 1).Activate
         ElseIf Not Intersect(Target, rngC) Is Nothing Or Not Intersect(Target, rngD) Is Nothing _
@@ -265,7 +270,6 @@ Private Sub Worksheet_Change(ByVal Target As Range)
         End If
         OriginalRow = Target.Row - 1
         GoTo Pause
-    
     ElseIf Not Intersect(Target, rngLines) Is Nothing And Cells(Target.Row, 1).Interior.color = RGB(255, 255, 255) Then
         ' Se la cella � nella riga di lavoro e la cella all'inizio � bianca
         ' Imposta la riga originale e gestisce il cambio di testo
@@ -285,6 +289,11 @@ Private Sub Worksheet_Change(ByVal Target As Range)
         CheckName = False
 
         GoTo TextChange
+    ElseIf Target.Column < 6 And Target.Interior.color = RGB(255, 255, 255) Then
+        ' Se la cella selezionata non appartiene a nessuno degli intervalli specificati
+        ' e la cella all'inizio non e' bianca, cancella il contenuto della cella
+        Target.Value = ""
+        GoTo Cleanup
     Else
         If Not Intersect(Target, Range("AN170")) Is Nothing Or Not Intersect(Target, Range("A1")) Is Nothing Then
             With Target
@@ -578,6 +587,3 @@ Cleanup:
     Exit Sub
     
 End Sub
-
-
-

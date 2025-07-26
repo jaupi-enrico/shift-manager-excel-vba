@@ -287,6 +287,11 @@ Private Sub Worksheet_Change(ByVal Target As Range)
         CheckName = False
 
         GoTo TextChange
+    ElseIf Target.Column < 6 And Target.Interior.color = RGB(255, 255, 255) Then
+        ' Se la cella selezionata non appartiene a nessuno degli intervalli specificati
+        ' e la cella all'inizio non e' bianca, cancella il contenuto della cella
+        Target.Value = ""
+        GoTo Cleanup
     Else
         If Not Intersect(Target, Range("AQ149")) Is Nothing Or Not Intersect(Target, rngResp) Is Nothing Then
             With Target
