@@ -9,9 +9,20 @@ Dim ChangedAfterSave As Boolean
 
 Private Sub Workbook_BeforeClose(Cancel As Boolean)
     ' Controlla se ci sono modifiche non salvate
-    On Error Resume Next
-    Call Changes.ApplyChanges
-    On Error GoTo 0
+    Dim comp As Object
+    Dim found As Boolean
+    found = False
+
+    For Each comp In ThisWorkbook.VBProject.VBComponents
+        If comp.Name = "Changes" Then
+            found = True
+            Exit For
+        End If
+    Next
+
+    If found Then
+        Call Changes.ApplyChanges
+    End If
     Changed = False
     Answer = MsgBox("Vuoi salvare?", vbYesNoCancel + vbQuestion + vbDefaultButton1)
     Dim Password As String
