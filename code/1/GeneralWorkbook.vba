@@ -8,7 +8,10 @@ Dim ChangedAfterSave As Boolean
 
 
 Private Sub Workbook_BeforeClose(Cancel As Boolean)
+    ' Controlla se ci sono modifiche non salvate
+    On Error Resume Next
     Call Changes.ApplyChanges
+    On Error GoTo 0
     Changed = False
     Answer = MsgBox("Vuoi salvare?", vbYesNoCancel + vbQuestion + vbDefaultButton1)
     Dim Password As String
