@@ -159,6 +159,32 @@ Function Paint_Worker(ByVal Pos As Integer, ByVal Role As Integer)
     End With
 End Function
 
+Function TrovaRigaValida(ws As Worksheet, colOffset As Integer, workerRow As Integer, LastRowMax As Integer) As Integer
+    Dim i As Integer
+
+    ' Cerca in basso
+    For i = workerRow + 1 To LastRowMax
+        If ws.Cells(i, colOffset).Value <> "FERIE" And _
+           ws.Cells(i, colOffset).Value <> "MALATTIA" And _
+           ws.Cells(i, colOffset).Value <> "CORSO" Then
+            TrovaRigaValida = i
+            Exit Function
+        End If
+    Next i
+
+    ' Cerca in alto
+    For i = workerRow - 1 To 2 Step -1
+        If ws.Cells(i, colOffset).Value <> "FERIE" And _
+           ws.Cells(i, colOffset).Value <> "MALATTIA" And _
+           ws.Cells(i, colOffset).Value <> "CORSO" Then
+            TrovaRigaValida = i
+            Exit Function
+        End If
+    Next i
+
+    TrovaRigaValida = -1 ' Nessuna riga valida trovata
+End Function
+
 Sub Check_Days(ByVal Worker As Integer, ByVal WorkerRole As Integer)
     Dim wsDip As Worksheet, wsTOT As Worksheet
     Dim i As Integer, colOffset As Integer
