@@ -289,7 +289,7 @@ Private Sub Worksheet_Change(ByVal Target As Range)
         CheckName = False
 
         GoTo TextChange
-    ElseIf Target.Column < 6 And Target.Interior.color = RGB(255, 255, 255) Then
+    ElseIf Target.Column < 6 And Target.Row > 15 And Target.Interior.color = RGB(255, 255, 255) Then
         ' Se la cella selezionata non appartiene a nessuno degli intervalli specificati
         ' e la cella all'inizio non e' bianca, cancella il contenuto della cella
         Target.Value = ""
