@@ -1,0 +1,39 @@
+Option Explicit
+
+Private Sub Worksheet_SelectionChange(ByVal Target As Range)
+    Dim Password
+    Dim rngFormazione As Range
+    Dim rngTotalone As Range
+    Dim rngCorsi As Range
+    Dim LastRow As Integer
+    Dim Row As Integer
+    Password = "Ej20082018*Excel"
+    
+    LastRow = 4
+    While Cells(LastRow, 1) <> ""
+        LastRow = LastRow + 1
+    Wend
+    LastRow = LastRow - 1
+    
+    Set rngFormazione = Range("C4", Cells(LastRow, 16))
+    Set rngTotalone = Range("T4", Cells(LastRow, 55))
+    Set rngCorsi = Range("BG4", Cells(LastRow, 72))
+    
+    Row = LastRow + 2
+
+    LastRow = 4
+    While Cells(LastRow, 58) <> ""
+        LastRow = LastRow + 1
+    Wend
+
+    If Not Intersect(Target, rngFormazione) Is Nothing Or Not Intersect(Target, rngTotalone) Is Nothing _
+    Or Not Intersect(Target, rngCorsi) Is Nothing Then
+        ActiveSheet.Unprotect Password:=Password
+    ElseIf Target.Row >= Row And Target.Row <= LastRow And Target.Column >= 58 And Target.Column <= 72 Then
+        ActiveSheet.Unprotect Password:=Password
+    ElseIf Target.Row >= Row And Target.Row <= LastRow And Target.Column = 1 Then
+        ActiveSheet.Unprotect Password:=Password
+    Else
+        ActiveSheet.Protect Password:=Password
+    End If    
+End Sub
