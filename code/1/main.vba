@@ -15,7 +15,7 @@ Private Sub Worksheet_SelectionChange(ByVal Target As Range)
 
     Set rngDati = Range("C21:J26")
 
-    If Not Intersect(Target, rngDati) Is Nothing And Not Intersect(Target, Range("B2")) Is Nothing Then
+    If Not Intersect(Target, rngDati) Is Nothing Or Not Intersect(Target, Range("B2")) Is Nothing Then
         ActiveSheet.Unprotect Password:=Password
     Else
         ActiveSheet.Protect Password:=Password
