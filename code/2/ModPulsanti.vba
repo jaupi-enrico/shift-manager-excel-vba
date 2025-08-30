@@ -44,6 +44,8 @@ Sub Delete_images()
     Dim sheet As Worksheet
     Dim shp As Shape
 
+    Call ShowSheets
+
     For Each sheet In Worksheets
         ' Escludi i fogli "DASHBOARD" e "TOT"
         If sheet.name <> "DASHBOARD" And sheet.name <> "TOT" And _
@@ -58,7 +60,9 @@ Sub Delete_images()
             Next shp
         End If
     Next sheet
-    
+
+    Call HideSheets
+
     MsgBox "Ottimizzazione finita"
 End Sub
 
@@ -306,7 +310,7 @@ Sub Hide_Lines()
 
             If Not names_range Is Nothing Then
                 For Each cell_y In names_range
-                    If Not IsEmpty(cell_y.Interior.color) And cell_y.Interior.color = RGB(217, 217, 217) Then
+                    If Not IsEmpty(cell_y.Interior.color) And Not cell_y.Interior.color = RGB(255, 255, 255) Then
                         clear = True
                         clear_up = True
                         clear_down = True
@@ -397,7 +401,7 @@ Sub Hide_Lines()
 
             If Not names_range Is Nothing Then
                 For Each cell_y In names_range
-                    If Not IsEmpty(cell_y.Interior.color) And cell_y.Interior.color = RGB(217, 217, 217) Then
+                    If Not IsEmpty(cell_y.Interior.color) And Not cell_y.Interior.color = RGB(255, 255, 255) Then
                         clear = True
                         clear_up = True
                         clear_down = True

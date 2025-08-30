@@ -112,7 +112,9 @@ Function Paint_Name_Cell()
     ' Se la cella del nome � vuota e le colonne "I" e "F" sono valide
     ' allora evidenziala in giallo
     ' Altrimenti, ripristina il colore originale
-    If Cells(OriginalRow, 1).Value = "" And columnI > 0 And columnF > 0 Then
+    Call Find_Column_I_F
+
+    If Cells(OriginalRow, 1).Value = "" And (columnI > 0 Or columnF > 0) Then
         Cells(OriginalRow, 1).Interior.color = RGB(255, 255, 0)
     Else
         Cells(OriginalRow, 1).Interior.color = RGB(217, 217, 217)
@@ -439,6 +441,8 @@ BlockLine:
         Target.Value = ""
     End If
 
+    Call Paint_Name_Cell
+
     ' Fine della gestione del blocco
     GoTo Cleanup
     
@@ -527,6 +531,8 @@ NameChange:
                 AnswerQuestion = MsgBox("Nome gi� inserito", vbCritical + vbRetryCancel + vbDefaultButton1)
                 If AnswerQuestion = vbRetry Then
                     Cells(OriginalRow, 1).ClearContents
+                ElseIf AnswerQuestion = vbCancel Then
+                    Cells(OriginalRow, 1).ClearContents
                 End If
                 Exit For
             End If
@@ -587,6 +593,3 @@ Cleanup:
     Exit Sub
     
 End Sub
-
-
-
