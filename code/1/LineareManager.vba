@@ -254,6 +254,15 @@ Private Sub Worksheet_Change(ByVal Target As Range)
         ' Imposta la riga originale e il flag per il controllo del nome
         OriginalRow = Target.Row
         Target.Value = UCase(Target.Value)
+
+        With Target
+            .HorizontalAlignment = xlCenter
+            .VerticalAlignment = xlCenter
+            .Font.name = "Verdana"
+            .Font.Bold = True
+            .Font.Size = 24
+        End With
+
         CheckName = True
         GoTo NameChange
     ElseIf Not Intersect(Target, rngLines) Is Nothing And Cells(Target.Row, 1).Interior.color <> RGB(255, 255, 255) Then
