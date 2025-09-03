@@ -550,14 +550,20 @@ NameChange:
     
     If columnI > 0 And columnF > 0 Then
         Call Paint_Name_Cell
-    
         Call Calculate_Name_Column(Target)
+        If CheckName Then
+            GoTo Cleanup
+        End If
     End If
     
+    Dim CheckedRow As Integer
+    
+    CheckedRow = OriginalRow
+
     ' Controlla se e' stato modificato il nome di un altra riga
     ' in caso di modifica, aggiorna la riga originale e ripeti il processo
-    If OriginalRow < 148 And Cells(OriginalRow + 2, 1).Interior.color <> RGB(255, 255, 255) Then
-        OriginalRow = OriginalRow + 2
+    If CheckedRow < 148 And Cells(CheckedRow + 2, 1).Interior.color <> RGB(255, 255, 255) Then
+        OriginalRow = CheckedRow + 2
         Find_Column_I_F
         If columnF > 0 And columnI > 0 Then
             ' Gestione del cambio di posizione del nome
@@ -565,8 +571,8 @@ NameChange:
         End If
     End If
 
-    If OriginalRow > 2 And Cells(OriginalRow - 2, 1).Interior.color <> RGB(255, 255, 255) Then
-        OriginalRow = OriginalRow - 2
+    If CheckedRow > 2 And Cells(CheckedRow - 2, 1).Interior.color <> RGB(255, 255, 255) Then
+        OriginalRow = CheckedRow - 2
         Find_Column_I_F
         If columnF > 0 And columnI > 0 Then
             ' Gestione del cambio di posizione del nome

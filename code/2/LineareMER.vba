@@ -25,7 +25,7 @@ Dim AnswerQuestion As Long
 Dim AllColumnsOccupied As Boolean
 
 Function Find_Name_Column()
-    ' Se la colonna del nome � gi� occupata o � un orario di pausa
+    ' Se la colonna del nome ? gi? occupata o ? un orario di pausa
     ' cerca la colonna successiva disponibile
     If Cells(OriginalRow - 1, ColumnName).Value <> "" Or Cells(OriginalRow, ColumnName).Value = "" Then
         ColumnNameTemp = ColumnName
@@ -46,7 +46,7 @@ Function Find_Name_Column()
     
             ColumnName = ColumnNameTemp + i
             
-            ' Se la colonna supera la colonna "I", permetti la ricerca anche se � un orario di pausa
+            ' Se la colonna supera la colonna "I", permetti la ricerca anche se ? un orario di pausa
             If ColumnName = columnI And Cells(OriginalRow - 1, ColumnName).Value <> "" Then
                 i = 0
                 incrementing = True
@@ -76,7 +76,7 @@ Function Find_Name_Column()
 End Function
 
 Function CancelName(ByVal Target As Range)
-    ' Cancella il nome se gi� presente in tutte le colonne
+    ' Cancella il nome se gi? presente in tutte le colonne
     For Each cell In Range(Cells(OriginalRow - 1, 6), Cells(OriginalRow - 1, 70))
         If (cell.Value <> "" And cell.Value = Cells(OriginalRow, 1).Value) Or (Target.Column = 1 And cell.Value = content) Then
             cell.ClearContents
@@ -91,8 +91,8 @@ Function Calculate_Name_Column(ByVal Target As Range)
     
     Call CancelName(Target)
 
-    ' Sistema la colonna del nome se � gi� occupata
-    ' oppure � un orario di pausa
+    ' Sistema la colonna del nome se ? gi? occupata
+    ' oppure ? un orario di pausa
     Call Find_Name_Column
 
     ' Mette il nome al turno e formatta la cella
@@ -109,7 +109,7 @@ Function Calculate_Name_Column(ByVal Target As Range)
 End Function
 
 Function Paint_Name_Cell()
-    ' Se la cella del nome � vuota e le colonne "I" e "F" sono valide
+    ' Se la cella del nome ? vuota e le colonne "I" e "F" sono valide
     ' allora evidenziala in giallo
     ' Altrimenti, ripristina il colore originale
     Call Find_Column_I_F
@@ -139,7 +139,7 @@ Function Find_Column_I_F()
 End Function
 
 Function TextChange(ByVal Target As Range)
-    ' Controlla se il valore della cella � "P" e se la cella sopra � vuota
+    ' Controlla se il valore della cella ? "P" e se la cella sopra ? vuota
     If (Target.Value <> "") And (Target.Value <> Cells(Target.Row + 1, 1).Value) Then
         ' Formatta la cella per un commento
         With Cells(Target.Row, Target.Column)
@@ -151,7 +151,7 @@ Function TextChange(ByVal Target As Range)
             .Interior.color = RGB(255, 255, 0)
         End With
     End If
-    ' Se il valore della cella � vuoto
+    ' Se il valore della cella ? vuoto
     If Target.Value = "" Then
         ' Ripristina il formato della cella
         If (Target.Column <= 30 And Target.Column >= 22) Or (Target.Column <= 49 And Target.Column >= 41) Then
@@ -179,7 +179,7 @@ Private Sub Worksheet_SelectionChange(ByVal Target As Range)
     Set rngDiff = Range("B16:B165")
     Set rngE = Range("E16:E165")
     On Error Resume Next
-    ' Verifica se � stata selezionata una sola cella
+    ' Verifica se ? stata selezionata una sola cella
     If Target.Cells.Count = 1 Then
         ' Salva il contenuto della cella selezionata
         content = Target.Formula
@@ -189,8 +189,8 @@ Private Sub Worksheet_SelectionChange(ByVal Target As Range)
 
     ' BUG!!
     If ActiveWindow.SelectedSheets.Count = 1 Then
-        ' Controlla se la cella selezionata � all'interno di uno degli intervalli specificati
-        ' Se � cos�, de-protegge il foglio
+        ' Controlla se la cella selezionata ? all'interno di uno degli intervalli specificati
+        ' Se ? cos?, de-protegge il foglio
         If Not Intersect(Target, rngDiff) Is Nothing Then
             ActiveSheet.Protect Password:=Password
             ActiveSheet.Cells(Target.Row, Target.Column - 1).Activate
@@ -228,7 +228,7 @@ Private Sub Worksheet_Change(ByVal Target As Range)
     Set rngDiff = Range("B16:B165")
 
     ' Non togliere questa parte, serve per evitare errori
-    ' per il men� a tendina.
+    ' per il men? a tendina.
     ' Tempo speso = 5 Ore
     If Application.Ready = False Then Exit Sub
     If Application.CommandBars("Cell").Enabled = False Then Exit Sub
@@ -236,15 +236,15 @@ Private Sub Worksheet_Change(ByVal Target As Range)
     ' Disabilita temporaneamente gli eventi
     Application.EnableEvents = False
     
-    ' Verifica se la cella cambiata � all'interno di uno degli intervalli specificati
+    ' Verifica se la cella cambiata ? all'interno di uno degli intervalli specificati
     If Not Intersect(Target, rngC) Is Nothing And Target.Interior.color <> RGB(255, 255, 255) Then
-        ' Se la cella � nella colonna di inizio orario e la cella all'inizio non � bianca
+        ' Se la cella ? nella colonna di inizio orario e la cella all'inizio non ? bianca
         ' Imposta il valore di "orario" e la riga originale
         orario = Target.Text
         OriginalRow = Target.Row
         rangeName = "I"
     ElseIf Not Intersect(Target, rngD) Is Nothing And Target.Interior.color <> RGB(255, 255, 255) Then
-        ' Se la cella � nella colonna di fine orario e la cella all'inizio non � bianca
+        ' Se la cella ? nella colonna di fine orario e la cella all'inizio non ? bianca
         ' Imposta il valore di "orario" e la riga originale
         orario = Target.Text
         OriginalRow = Target.Row
@@ -253,19 +253,19 @@ Private Sub Worksheet_Change(ByVal Target As Range)
         Target.Formula = content
         GoTo Cleanup
     ElseIf Not Intersect(Target, rngName) Is Nothing And Target.Interior.color <> RGB(255, 255, 255) Then
-        ' Se la cella � nella colonna del nome e la cella all'inizio non � bianca
+        ' Se la cella ? nella colonna del nome e la cella all'inizio non ? bianca
         ' Imposta la riga originale e il flag per il controllo del nome
         OriginalRow = Target.Row
         Target.Value = UCase(Target.Value)
         CheckName = True
         GoTo NameChange
     ElseIf Not Intersect(Target, rngLines) Is Nothing And Cells(Target.Row, 1).Interior.color <> RGB(255, 255, 255) Then
-        ' Se la cella � nella riga di lavoro e la cella all'inizio non � bianca
+        ' Se la cella ? nella riga di lavoro e la cella all'inizio non ? bianca
         ' Imposta la riga originale e gestisce il blocco degli orari
         OriginalRow = Target.Row
         GoTo BlockLine
     ElseIf Not Intersect(Target, rngLines) Is Nothing And (Target.Value = "P" Or Target.Value = "p" Or content = "P") Then
-        ' Se la cella � nella riga di lavoro e il valore � "P" o il suo vecchio valore � "P"
+        ' Se la cella ? nella riga di lavoro e il valore ? "P" o il suo vecchio valore ? "P"
         ' Imposta la riga originale e gestisce il blocco della pausa
         If Target.Value = "p" Then
             Target.Value = "P"
@@ -273,7 +273,7 @@ Private Sub Worksheet_Change(ByVal Target As Range)
         OriginalRow = Target.Row - 1
         GoTo Pause
     ElseIf Not Intersect(Target, rngLines) Is Nothing And Cells(Target.Row, 1).Interior.color = RGB(255, 255, 255) Then
-        ' Se la cella � nella riga di lavoro e la cella all'inizio � bianca
+        ' Se la cella ? nella riga di lavoro e la cella all'inizio ? bianca
         ' Imposta la riga originale e gestisce il cambio di testo
         If Cells(Target.Row - 1, Target.Column).Value = "N" Or Cells(Target.Row - 1, Target.Column).Value = "I" Or Cells(Target.Row - 1, Target.Column).Value = "F" Then
             OriginalRow = Target.Row - 1
@@ -309,11 +309,11 @@ Private Sub Worksheet_Change(ByVal Target As Range)
         GoTo Cleanup
     End If
 
-    ' Controlla se la formula salvata � valida prima di assegnarla
+    ' Controlla se la formula salvata ? valida prima di assegnarla
     If Not IsError(Application.Evaluate(content)) Then
         Target.Formula = content
     Else
-        MsgBox "Errore: La formula salvata non � valida."
+        MsgBox "Errore: La formula salvata non ? valida."
     End If
 
     ' Definisci l'intervallo in cui vuoi cercare (ad esempio, la riga 1)
@@ -323,7 +323,7 @@ Private Sub Worksheet_Change(ByVal Target As Range)
 
     ' Cicla attraverso ogni cella nella riga specificata
     For Each Time In Times
-        ' Se l'orario � alle 6, chiedi se di mattina
+        ' Se l'orario ? alle 6, chiedi se di mattina
         If orario = "6:00" Then
             Answer = MsgBox("Le 6:00 di mattina?", vbYesNo + vbQuestion + vbDefaultButton1)
             If Answer = vbYes Then
@@ -348,7 +348,7 @@ Private Sub Worksheet_Change(ByVal Target As Range)
         End If
     Next Time
 
-    ' Se � stata trovata la colonna, aggiorna la cella corrispondente
+    ' Se ? stata trovata la colonna, aggiorna la cella corrispondente
     If ColumnFound > 0 Then
         Cells(OriginalRow, ColumnFound).Value = rangeName
         ' Aggiorna la variabile Column corrispondente
@@ -358,7 +358,7 @@ Private Sub Worksheet_Change(ByVal Target As Range)
             columnF = ColumnFound
         End If
     ElseIf orario = "" Then
-        ' Passa oltre se l'orario � vuoto
+        ' Passa oltre se l'orario ? vuoto
         ' (Nessuna azione viene eseguita in questo caso)
     Else
         ' Errore se non l'orario non viene trovato
@@ -402,10 +402,10 @@ Private Sub Worksheet_Change(ByVal Target As Range)
         Next Column
     End If
     
-    ' Errore se la collona di I � maggiore della colonna di F
+    ' Errore se la collona di I ? maggiore della colonna di F
     If columnI > 0 And columnF > 0 And columnI > columnF Then
-        MsgBox "Errore: L'ora di inizio � dopo quella di fine.", vbRetryCancel + vbCritical
-        ' Cancella il nome se gi� presente
+        MsgBox "Errore: L'ora di inizio ? dopo quella di fine.", vbRetryCancel + vbCritical
+        ' Cancella il nome se gi? presente
         Call CancelName(Target)
         Cells(OriginalRow, columnF).Value = ""
         columnF = 0
@@ -436,7 +436,7 @@ BlockLine:
         Target.Value = "F"
     End If
     
-    ' Se il valore della cella non � "I", "N" o "F", cancella il contenuto
+    ' Se il valore della cella non ? "I", "N" o "F", cancella il contenuto
     If (Target.Value <> "I") And (Target.Value <> "N") And (Target.Value <> "F") Then
         Target.Value = ""
     End If
@@ -453,7 +453,7 @@ TextChange:
   
 Pause:
     
-    ' Se il valore della cella � "P" e la cella sopra � "N"
+    ' Se il valore della cella ? "P" e la cella sopra ? "N"
     ' cancella il contenuto della cella sopra e formatta la cella corrente
     If Target.Value = "P" Then
         If Cells(Target.Row - 1, Target.Column).Value = "N" Then
@@ -479,8 +479,8 @@ Pause:
             GoTo TextChange
         End If
 
-    ' Se il valore della cella era "P" e la cella sopra � vuota
-    ' e la colonna corrente � compresa tra "I" e "F"
+    ' Se il valore della cella era "P" e la cella sopra ? vuota
+    ' e la colonna corrente ? compresa tra "I" e "F"
     ' imposta il valore a "N" alla cella sopra
     ElseIf content = "P" Then
         If Cells(Target.Row - 1, 1).Interior.color = RGB(255, 255, 255) Then
@@ -516,19 +516,19 @@ Pause:
         MsgBox "Errore nel blocco pausa."
     End If
 
-    ' Se il nome � presente allora gestisci il cambio di posizione del nome
+    ' Se il nome ? presente allora gestisci il cambio di posizione del nome
     If Cells(OriginalRow, 1).Value <> "" Then
         GoTo NameChange
     End If
 
 NameChange:
 
-    ' Se il flag CheckName � attivo ed � presente un nome
-    ' controlla se il nome � gi� presente in un'altra cella
+    ' Se il flag CheckName ? attivo ed ? presente un nome
+    ' controlla se il nome ? gi? presente in un'altra cella
     If CheckName And Cells(OriginalRow, 1).Value <> "" Then
         For Each cell In Range(Cells(16, 1), Cells(165, 1))
             If cell.Value = Cells(OriginalRow, 1).Value And cell.Address <> Cells(OriginalRow, 1).Address Then
-                AnswerQuestion = MsgBox("Nome gi� inserito", vbCritical + vbRetryCancel + vbDefaultButton1)
+                AnswerQuestion = MsgBox("Nome gi? inserito", vbCritical + vbRetryCancel + vbDefaultButton1)
                 If AnswerQuestion = vbRetry Then
                     Cells(OriginalRow, 1).ClearContents
                 ElseIf AnswerQuestion = vbCancel Then
@@ -543,14 +543,20 @@ NameChange:
     
     If columnI > 0 And columnF > 0 Then
         Call Paint_Name_Cell
-    
         Call Calculate_Name_Column(Target)
+        If CheckName Then
+            GoTo Cleanup
+        End If
     End If
     
-    ' Controlla se il � stato modificato il nome di un altra riga
+    Dim CheckedRow As Integer
+    
+    CheckedRow = OriginalRow
+    
+    ' Controlla se il ? stato modificato il nome di un altra riga
     ' in caso di modifica, aggiorna la riga originale e ripeti il processo
-    If OriginalRow < 164 And Cells(OriginalRow + 2, 1).Interior.color <> RGB(255, 255, 255) Then
-        OriginalRow = OriginalRow + 2
+    If CheckedRow < 164 And Cells(CheckedRow + 2, 1).Interior.color <> RGB(255, 255, 255) Then
+        OriginalRow = CheckedRow + 2
         Find_Column_I_F
         If columnF > 0 And columnI > 0 Then
             ' Gestione del cambio di posizione del nome
@@ -558,8 +564,8 @@ NameChange:
         End If
     End If
 
-    If OriginalRow > 17 And Cells(OriginalRow - 2, 1).Interior.color <> RGB(255, 255, 255) Then
-        OriginalRow = OriginalRow - 2
+    If CheckedRow > 17 And Cells(CheckedRow - 2, 1).Interior.color <> RGB(255, 255, 255) Then
+        OriginalRow = CheckedRow - 2
         Find_Column_I_F
         If columnF > 0 And columnI > 0 Then
             ' Gestione del cambio di posizione del nome
