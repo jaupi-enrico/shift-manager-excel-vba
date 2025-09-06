@@ -289,6 +289,75 @@ Function Update_Validation()
     Next ws
 End Function
 
+Sub UpdateFormatConditions()
+    Call ShowSheets
+    Dim wsTOT As Worksheet
+    Dim rng As Range, rngTemp As Range
+    Dim LastRow As Long, i As Long
+    Dim fc As FormatCondition
+    Dim col1 As String, col2 As String, formula As String
+    Dim col3 As String, col4 As String
+    
+    Set wsTOT = ThisWorkbook.Sheets("TOT-M")
+    
+    ' Trova ultima riga colonna A
+    LastRow = wsTOT.Cells(wsTOT.Rows.Count, 1).End(xlUp).Row
+    
+    ' Definisci intervallo
+    Set rng = wsTOT.Range("D4:Q" & LastRow)
+    
+    ' Cancella tutte le formattazioni condizionali
+    rng.FormatConditions.Delete
+    
+    ' Ciclo sulle coppie di colonne (E:F, G:H, I:J, ...)
+    For i = 0 To (rng.Columns.Count \ 2) - 2
+        Set rngTemp = rng.Offset(0, i * 2 + 1).Resize(rng.Rows.Count, 2)
+        
+        ' Converte l’indice di colonna in lettera (es. 5 in "E")
+        col1 = Split(wsTOT.Cells(1, rngTemp.Columns(1).Column).Address(True, False), "$")(0)
+        col2 = Split(wsTOT.Cells(1, rngTemp.Columns(2).Column).Address(True, False), "$")(0)
+        col3 = Split(wsTOT.Cells(1, rngTemp.Columns(0).Column).Address(True, False), "$")(0)
+
+        ' Formula condizionale dinamica
+        formula = "=E(" & _
+                  "O($" & col1 & "4<>""OFF"";$" & col2 & "4<>""OFF"");" & _
+                  "O(" & _
+                     "E($" & col3 & "4>$" & col1 & "4;$" & col2 & "4-$" & col1 & "4<0,46);" & _
+                     "E($" & col3 & "4<$" & col1 & "4;(1-$" & col1 & "4)+($" & col2 & "4)<0,46)" & _
+                  ")" & _
+                 ")"
+        
+        ' Applica la regola
+        Set fc = rngTemp.FormatConditions.Add(Type:=xlExpression, Formula1:=formula)
+        fc.Interior.color = RGB(255, 0, 0) ' Rosso
+        fc.Font.Bold = True
+        fc.Font.color = RGB(255, 255, 255) ' Bianco
+    Next i
+
+    For i = 0 To 4
+        Set rngTemp = rng.Offset(0, i * 2 + 1).Resize(rng.Rows.Count, 4)
+        
+        ' Converte l’indice di colonna in lettera (es. 5 in "E")
+        col1 = Split(wsTOT.Cells(1, rngTemp.Columns(0).Column).Address(True, False), "$")(0)
+        col2 = Split(wsTOT.Cells(1, rngTemp.Columns(1).Column).Address(True, False), "$")(0)
+        col3 = Split(wsTOT.Cells(1, rngTemp.Columns(2).Column).Address(True, False), "$")(0)
+        col4 = Split(wsTOT.Cells(1, rngTemp.Columns(4).Column).Address(True, False), "$")(0)
+
+        ' Formula condizionale dinamica
+        formula = "=E($" & col2 & "4<>""OFF"";$" & col3 & "4=""OFF"";$" & col4 & "4<>""OFF"";" & _
+                  "O(E($" & col1 & "4>$" & col2 & "4;$" & col4 & "4-$" & col2 & "4<0,46);" & _
+                  "E($" & col1 & "4<$" & col2 & "4;(1-$" & col2 & "4)+$" & col4 & "4<0,46)))"
+        ' Applica la regola
+        Set fc = rngTemp.FormatConditions.Add(Type:=xlExpression, Formula1:=formula)
+        fc.Interior.color = RGB(255, 0, 0) ' Rosso
+        fc.Font.Bold = True
+        fc.Font.color = RGB(255, 255, 255) ' Bianco
+    Next i
+
+    Set fc = rng.FormatConditions.Add(Type:=xlCellValue, Operator:=xlEqual, Formula1:="=""OFF""")
+    fc.Font.Bold = True
+    fc.Font.color = RGB(51, 51, 255) ' Blu
+End Sub
 
 ' Aggiorna tutti i lavoratori dal foglio Dipendenti
 Sub Update_Workers_M()
@@ -348,6 +417,8 @@ Sub Update_Workers_M()
     Wend
 
     Call Update_Validation
+
+    Call UpdateFormatConditions
 
     Application.StatusBar = False
     Application.ScreenUpdating = True
