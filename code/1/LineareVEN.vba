@@ -80,6 +80,7 @@ Function CancelName(ByVal Target As Range)
     For Each cell In Range(Cells(OriginalRow - 1, 6), Cells(OriginalRow - 1, 70))
         If (cell.Value <> "" And cell.Value = Cells(OriginalRow, 1).Value) Or (Target.Column = 1 And cell.Value = content) Then
             cell.ClearContents
+            Exit For
         End If
     Next cell
 End Function
