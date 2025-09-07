@@ -389,6 +389,31 @@ Sub UpdateFormatConditions()
     fc.Font.color = RGB(51, 51, 255) ' Blu
 End Sub
 
+Sub FixErrorsDays()
+    Call ShowSheets
+    Dim ws As Worksheet
+    Dim cell As Range
+    Dim giorniSettimana As Variant
+    giorniSettimana = Array("LUN", "MAR", "MER", "GIO", "VEN", "SAB", "DOM")
+
+    For Each ws In ThisWorkbook.Worksheets
+        If Not IsError(Application.Match(ws.name, giorniSettimana, 0)) Then
+            For Each cell In ws.Range("B16:B165")
+                If cell.Interior.color = RGB(217, 217, 217) Then
+                    ' Formula for total hours (column B)
+                    cell.Formula2 = "=IFERROR(D" & cell.Row & "-C" & cell.Row & "+IF(C" & cell.Row & ">=D" & cell.Row & ",1),0)*24"
+                    
+                    ' Formula for "I" time (column C)
+                    cell.Offset(0, 1).Formula2 = "=IFERROR(TIMEVALUE(INDEX($F$1:$BR$1,MATCH(""I"",$F" & cell.Row & ":$BR" & cell.Row & ",0))),""OFF"")"
+                    
+                    ' Formula for "F" time (column D)
+                    cell.Offset(0, 2).Formula2 = "=IFERROR(TIMEVALUE(INDEX($F$1:$BR$1,MATCH(""F"",$F" & cell.Row & ":$BR" & cell.Row & ",0))),""OFF"")"
+                End If
+            Next cell
+        End If
+    Next ws
+End Sub
+
 ' Aggiorna tutti i lavoratori dal foglio Dipendenti
 Sub Update_Workers()
     Call ShowSheets
@@ -466,6 +491,8 @@ Sub Update_Workers()
     Call Update_Validation
 
     Call UpdateFormatConditions
+
+    Call FixErrorsDays
 
     Application.StatusBar = False
     Application.ScreenUpdating = True
