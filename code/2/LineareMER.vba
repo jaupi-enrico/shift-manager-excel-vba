@@ -200,7 +200,7 @@ Private Sub Worksheet_SelectionChange(ByVal Target As Range)
             ActiveSheet.Cells(Target.Row, Target.Column - 1).Activate
         ElseIf Not Intersect(Target, rngC) Is Nothing Or Not Intersect(Target, rngD) Is Nothing _
         Or Not Intersect(Target, rngName) Is Nothing Or Not Intersect(Target, rngLines) Is Nothing _
-        Or Not Intersect(Target, Range("AN170")) Is Nothing Or Not Intersect(Target, Range("A1")) Is Nothing Then
+        Or Not Intersect(Target, Range("AN170")) Is Nothing Then
             ActiveSheet.Unprotect Password:=Password
         Else
             ' Altrimenti, protegge il foglio

@@ -315,6 +315,17 @@ Private Sub Worksheet_Change(ByVal Target As Range)
                 .Font.Bold = True
                 .Font.Size = 36
             End With
+
+            If Target.Address = Range("A1").Address Then
+                    If IsDate(Target.Value) Then
+                        Target.Value = CDate(Target.Value)  ' Mantiene il valore come data
+                        Target.NumberFormat = "[$-0410]dddd dd mmmm yyyy" ' Mostra "lunedì 13 ottobre 2025"
+                    Else
+                        MsgBox "Errore: Inserire una data valida in formato 'gg/mm/aaaa'.", vbExclamation
+                        Target.Value = DateSerial(2024, 10, 10) ' imposta una data di default
+                        Target.NumberFormat = "[$-0410]dddd dd mmmm yyyy"
+                    End If
+                End If
         End If
         GoTo Cleanup
     End If
