@@ -201,6 +201,20 @@ Sub Check_Days(ByVal Worker As Integer, ByVal WorkerRole As Integer)
     Wend
     LastRowMax = LastRowMax - 1
 
+    ' Colore intestazione
+    If wsDip.Cells(Worker, 1).Value = "Si" Then
+        wsTOT.Cells(Worker + 1, 1).Interior.color = RGB(241, 170, 131)
+    ElseIf wsDip.Cells(Worker, 1).Value = "No" And wsTOT.Cells(Worker + 1, 1).Interior.color = RGB(241, 170, 131) Then
+        rigaValida = 4
+        While wsTOT.Cells(rigaValida, 1).Interior.color = RGB(241, 170, 131) And rigaValida <= LastRowMax
+            rigaValida = rigaValida + 1
+        Wend
+        wsTOT.Range(wsTOT.Cells(rigaValida, 4), wsTOT.Cells(rigaValida, 17)).Copy
+        wsTOT.Range(wsTOT.Cells(Worker + 1, 4), wsTOT.Cells(Worker + 1, 17)).PasteSpecial xlPasteAll
+        Call Paint_Worker(Worker + 1, WorkerRole)
+        wsTOT.Cells(Worker + 1, 1).Interior.color = RGB(255, 255, 255)
+    End If
+
     ' FERIE (colonne 10–16)
     For i = 10 To 16
         colOffset = 4 + (i - 10) * 2
@@ -260,20 +274,6 @@ Sub Check_Days(ByVal Worker As Integer, ByVal WorkerRole As Integer)
             End If
         End If
     Next i
-
-    ' Colore intestazione
-    If wsDip.Cells(Worker, 1).Value = "Si" Then
-        wsTOT.Cells(Worker + 1, 1).Interior.color = RGB(241, 170, 131)
-    ElseIf wsDip.Cells(Worker, 1).Value = "No" And wsTOT.Cells(Worker + 1, 1).Interior.color = RGB(241, 170, 131) Then
-        rigaValida = 4
-        While wsTOT.Cells(rigaValida, 1).Interior.color = RGB(241, 170, 131) And rigaValida <= LastRowMax
-            rigaValida = rigaValida + 1
-        Wend
-        wsTOT.Range(wsTOT.Cells(rigaValida, 4), wsTOT.Cells(Worker + 2, 17)).Copy
-        wsTOT.Range(wsTOT.Cells(Worker + 1, 4), wsTOT.Cells(Worker + 1, 17)).PasteSpecial xlPasteAll
-        Call Paint_Worker(Worker + 1, WorkerRole)
-        wsTOT.Cells(Worker + 1, 1).Interior.color = RGB(255, 255, 255)
-    End If
 End Sub
 
 Function Update_Validation()
