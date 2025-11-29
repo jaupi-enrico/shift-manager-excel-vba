@@ -40,8 +40,5 @@ Originally developed for a company linked to McDonald's, this project supports d
 ## ✍️ Author
 
 **Enrico Jaupi**  
-Computer Science Student — ITIS Castelli  
-Participant in the Italian Olympiads of Informatics & Mathematics  
-🔗 [GitHub](https://github.com/jaupi-enrico)
-
----
+Computer Science Student
+[GitHub](https://github.com/jaupi-enrico)
