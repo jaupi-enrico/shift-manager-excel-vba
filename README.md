@@ -34,8 +34,9 @@ Originally developed for a company linked to McDonald's, this project supports d
 - Workers
 <img src="https://github.com/jaupi-enrico/shift-manager-excel-vba/blob/main/docs/dipendenti.png">
 
-> ⚠️ Note: This is a student-developed project for educational and portfolio purposes. Bugs may be present.
+> ⚠️ Note: This is a student-developed project for portfolio purposes. Bugs may be present.
 > Black boxes are present in the screenshots to protect the privacy of real workers, they aren't present in the real file
+> Inside the file there are many parts missing. (Trademark and copyright issues)
 
 ## Author
 
