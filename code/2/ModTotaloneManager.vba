@@ -414,8 +414,7 @@ Sub Update_Workers_M()
             WorkerPos = NameFound(WorkerName, 3) - 3
             If WorkerPos = Worker - 2 And _
             wsTOT.Cells(WorkerPos + 3, 3).Value = WorkerName_Surname And _
-            wsTOT.Cells(WorkerPos + 3, 27).Value = WorkerContract And _
-            wsTOT.Cells(WorkerPos + 3, 2).Interior.color = color Then
+            wsTOT.Cells(WorkerPos + 3, 27).Value = WorkerContract Then
                 Call Check_Days(Worker)
             Else
                 Call Add_Worker(WorkerName, WorkerName_Surname, WorkerContract, Worker - 2)
