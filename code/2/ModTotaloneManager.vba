@@ -89,10 +89,10 @@ Sub Delete_Worker(ByVal WorkerPos As Integer)
     wsTOT.Activate: wsTOT.Range("A1").Activate
 End Sub
 
-' Trova un nome nella colonna 2 del foglio TOT a partire da una riga specifica
+' Trova un nome nella colonna 2 del foglio TOT-M a partire da una riga specifica
 Function NameFound(ByVal WorkerName As String, ByVal Start As String) As Integer
     Dim wsTOT As Worksheet, workerRow As Integer
-    Set wsTOT = Worksheets("TOT")
+    Set wsTOT = Worksheets("TOT-M")
     workerRow = Start + 1
     While wsTOT.Cells(workerRow, 2).Value <> ""
         If wsTOT.Cells(workerRow, 2).Value = WorkerName Then
