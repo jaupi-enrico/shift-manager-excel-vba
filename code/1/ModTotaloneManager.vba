@@ -431,7 +431,7 @@ Sub Update_Workers_M()
     Wend
 
     LastRow = 4
-    While wsTOT.Cells(LastRow, 2).Value <> "" And LastRow < Rows.Count
+    While wsTOT.Cells(LastRow, 1).Value <> "" And LastRow < Rows.Count
         LastRow = LastRow + 1
     Wend
 
