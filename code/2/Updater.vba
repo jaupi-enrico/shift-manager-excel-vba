@@ -45,7 +45,7 @@ Sub AggiornaCodiceVBA()
             End If
 
             ' Sostituisci il codice del modulo
-            With vbComp.CodeModule
+            With vbComp.codeModule
                 .DeleteLines 1, .CountOfLines
                 .AddFromString NuovoCodice
             End With
@@ -69,8 +69,10 @@ ErrorHandler:
     Unload Update
     If Err.Number = 1004 Then
         MsgBox "Abilita i permessi sugli oggetti come spiegato nella dashboard!"
+    ElseIf Err.Number = -2146697211 Then
+        MsgBox "Errore di connessione a internet"
     Else
-        MsgBox "Errore: " & Err.Number, vbCritical + vbOKOnly + vbDefaultButton1
+        MsgBox "Errore imprevisto: " & Err.Number & vbCrLf & Err.Description, vbCritical
     End If
 
 Continue:
