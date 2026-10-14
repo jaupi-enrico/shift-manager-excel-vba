@@ -25,7 +25,7 @@ Sub AggiornaCodiceVBA()
     Dim ModuloNome As String
     Dim tipo As Integer
     Dim BackupDir As String
-    Dim Fase As Integer          ' 1 = download, 2 = backup, 3 = sostituzione
+    Dim Fase As Integer          ' 1 = download, 2 = backup, 3 = sostituzione, 4 = sostituzione di Updater
 
     On Error GoTo ErrorHandler
 
@@ -92,6 +92,8 @@ Sub AggiornaCodiceVBA()
            "Copia di backup: " & BackupDir, vbInformation
 
     If Nuovo.Exists("Updater") Then
+        ' Ultima istruzione utile: dopo questa riga il codice in esecuzione viene sostituito
+        Fase = 4
         Sostituisci_Codice vbProj.VBComponents("Updater").codeModule, CStr(Nuovo("Updater"))
     End If
     Exit Sub
@@ -111,6 +113,9 @@ ErrorHandler:
         MsgBox "Abilita i permessi sugli oggetti come spiegato nella dashboard!"
     ElseIf ErrNum = -2146697211 Then
         MsgBox "Errore di connessione a internet"
+    ElseIf Fase = 4 Then
+        MsgBox "Tutti i moduli sono stati aggiornati ma non e' stato possibile aggiornare il modulo Updater: " & ErrNum & vbCrLf & ErrDesc & vbCrLf & _
+               "Copia di backup: " & BackupDir, vbExclamation
     ElseIf Fase = 3 Then
         MsgBox "Aggiornamento interrotto durante la sostituzione dei moduli: " & ErrNum & vbCrLf & ErrDesc & vbCrLf & _
                "Alcuni moduli potrebbero essere gia' aggiornati. Copia di backup: " & BackupDir, vbCritical

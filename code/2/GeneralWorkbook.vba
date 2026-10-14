@@ -109,7 +109,12 @@ Private Sub Workbook_Open()
     Worksheets(1).Activate
     ' Esegue l'aggiornamento a Workbook_Open concluso, cosi' nessun modulo
     ' viene riscritto mentre e' ancora in esecuzione
-    Application.OnTime Now + TimeSerial(0, 0, 2), "'" & ThisWorkbook.name & "'!AggiornaCodiceVBA"
+    Err.Clear
+    Application.OnTime Now + TimeSerial(0, 0, 2), "'" & Replace(ThisWorkbook.name, "'", "''") & "'!AggiornaCodiceVBA"
+    If Err.Number <> 0 Then
+        MsgBox "Impossibile pianificare l'aggiornamento automatico del codice: " & Err.Description, vbExclamation
+        Err.Clear
+    End If
     On Error GoTo 0
 End Sub
 

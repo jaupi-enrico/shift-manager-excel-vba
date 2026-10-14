@@ -4,8 +4,8 @@ Last updated: 2026-10-14. All planned code work is done and merged into this bra
 
 ## Done (all merged into this branch)
 - `fix/review-findings`: the code-review fixes (details below).
-- `worktree-block-absent-workers`: `Lineare_Assenza` in `ModPulsanti`; `LineareLUN..DOM` reject a worker who is on FERIE/MALATTIA/CORSO that day. `MANAGER` unchanged. Also the freeze-panes fix (skipped when the window is too narrow) in `GeneralWorkbook`.
-- `LineareMAR`: `Worksheet_Change` dispatches to `Handle_Single_Change` / `Handle_Multi_Change`, so block delete/paste works instead of being rejected.
+- `worktree-block-absent-workers`: `Lineare_Assenza` in `ModPulsanti`; `LineareLUN..DOM` reject a worker who is on FERIE/MALATTIA/CORSO that day. Now also on `MANAGER` (per 21-row block = weekday, via `Lineare_Assenza_Giorno` on `TOT-M`). Also the freeze-panes fix (skipped when the window is too narrow) in `GeneralWorkbook`.
+- Block delete/paste (`Handle_Multi_Change`) on all seven day sheets and `MANAGER` (was only `LineareMAR`). Pasted names are also checked for absence.
 - `obfuscate-password`: sheet password and login PIN are XOR-encoded and exposed as functions (`ModPulsanti`, `LoginForm`). They are no longer plain text in the repo.
 
 ## Why this branch exists
@@ -21,7 +21,7 @@ Every deployed workbook runs `Updater.AggiornaCodiceVBA` on open and pulls the m
   - `1b60f04` `CLAUDE.md`
 
 ## IMPORTANT before merging to main
-- `Updater.vba` (code/1 and code/2) has `Private Const UPDATE_BRANCH As String = "merge/no-ui-alerts"` (commit `acb83a1`, for the test copy). **Change it back to `"main"` before any merge**, otherwise every user's workbook would start pulling from this branch.
+- `Updater.vba` (code/1 and code/2) has `UPDATE_BRANCH = "merge/no-ui-alerts"` (test copy). **Change it back to `"main"` before any merge.**
 
 ## What was changed
 | Area | Change |
@@ -47,7 +47,7 @@ Every deployed workbook runs `Updater.AggiornaCodiceVBA` on open and pulls the m
 - `Lineare*` consolidation (8 near-identical modules into one) is not done. It is the riskiest change, so do it only after this round is tested.
 - `Changes.ApplyChanges` is still never called.
 - `ModTotaloneManager.vba`: the diff against `ModTotalone.vba` was only partly reviewed.
-- The multi-cell guard in `Lineare*` blocks block-delete on all sheets except `LineareMAR`, which now handles it. Decide whether to port that to the others.
+- The block handlers (`Handle_Multi_Change`) are the riskiest new code: test block delete and paste on a day sheet and on `MANAGER`. The `MANAGER` version uses the same logic as `LineareMAR` with its own ranges, and the duplicate-name check is limited to the weekday block, like the single-cell code.
 - A module may be "different" every time if the VBE rewrites identifier casing, so it would be re-replaced on every open. This is no worse than before, but check it.
 
 ## Test plan (Windows, on a copy)
@@ -66,4 +66,10 @@ Every deployed workbook runs `Updater.AggiornaCodiceVBA` on open and pulls the m
 ## Next steps
 - Test on a copy and report results; fix whatever fails (on this branch).
 - Decide on password/PIN, `Lineare*` consolidation, and `ApplyChanges`.
-- When the owner says so: set `UPDATE_BRANCH` back to `"main"`, re-run `diff -r code/1 code/2`, then open the PR.
+- When the owner says so: re-run `diff -r code/1 code/2` and set `UPDATE_BRANCH` back to `"main"`, then open the PR.
+
+## Code-review fixes (latest round)
+- `Formula_To_English` is now a small tokenizer (E/O/SE/NON, `;`, decimal commas, quoted text untouched); callers skip the format if `Add_Cond_Format` returns `Nothing`.
+- `DatabaseWorkers*`: separate `ErrHandler`, so a stale `Err` can no longer show a false error.
+- `Updater`: phase 4 for the self-replacement, with an accurate message if only that step fails. `Workbook_Open` reports a failed `OnTime` scheduling.
+- Checked and left as is: `Update_Validation`, `Add_Worker`, `Delete_Worker` are only called from `Update_Workers`, which has an error handler.

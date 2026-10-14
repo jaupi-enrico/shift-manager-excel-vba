@@ -368,9 +368,11 @@ Sub UpdateFormatConditions()
         
         ' Applica la regola
         Set fc = Add_Cond_Format(rngTemp, formula)
-        fc.Interior.color = RGB(255, 0, 0) ' Rosso
-        fc.Font.Bold = True
-        fc.Font.color = RGB(255, 255, 255) ' Bianco
+        If Not fc Is Nothing Then
+            fc.Interior.color = RGB(255, 0, 0) ' Rosso
+            fc.Font.Bold = True
+            fc.Font.color = RGB(255, 255, 255) ' Bianco
+        End If
     Next i
 
     For i = 0 To 4
@@ -388,9 +390,11 @@ Sub UpdateFormatConditions()
                   "E($" & col1 & "4<$" & col2 & "4;(1-$" & col2 & "4)+$" & col4 & "4<0,46)))"
         ' Applica la regola
         Set fc = Add_Cond_Format(rngTemp, formula)
-        fc.Interior.color = RGB(255, 0, 0) ' Rosso
-        fc.Font.Bold = True
-        fc.Font.color = RGB(255, 255, 255) ' Bianco
+        If Not fc Is Nothing Then
+            fc.Interior.color = RGB(255, 0, 0) ' Rosso
+            fc.Font.Bold = True
+            fc.Font.color = RGB(255, 255, 255) ' Bianco
+        End If
     Next i
 
     Set fc = rng.FormatConditions.Add(Type:=xlCellValue, Operator:=xlEqual, Formula1:="=""OFF""")

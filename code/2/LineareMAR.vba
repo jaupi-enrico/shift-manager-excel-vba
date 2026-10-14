@@ -433,6 +433,8 @@ Private Sub Handle_Multi_Change(ByVal Target As Range)
     Dim newName As String
     Dim allNames As Variant
     Dim dupMsgShown As Boolean
+    Dim absMsgShown As Boolean
+    Dim absenceReason As String
 
     calcState = Application.Calculation
 
@@ -494,6 +496,18 @@ Private Sub Handle_Multi_Change(ByVal Target As Range)
                             End If
                         End If
                     Next k
+                End If
+                If newName <> "" Then
+                    ' Blocca i dipendenti in FERIE / MALATTIA / CORSO in questo giorno
+                    absenceReason = Lineare_Assenza(Me, newName)
+                    If absenceReason <> "" Then
+                        If Not absMsgShown Then
+                            MsgBox newName & " è in " & absenceReason & " questo giorno e non può essere inserito nel lineare.", vbCritical + vbOKOnly
+                            absMsgShown = True
+                        End If
+                        c.ClearContents
+                        newName = ""
+                    End If
                 End If
                 allNames(r - 15, 1) = newName
                 If newName <> "" Then

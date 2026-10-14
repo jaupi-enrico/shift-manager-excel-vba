@@ -45,15 +45,68 @@ Sub Set_Formula_Compat(ByVal rng As Range, ByVal formulaEN As String)
     On Error GoTo 0
 End Sub
 
-' Converte una formula italiana usata nelle formattazioni condizionali
-' (E/O, separatore ";", decimali con ",") nell'equivalente inglese
+' Converte una formula italiana usata nelle formattazioni condizionali nell'equivalente
+' inglese: nomi di funzione (E, O, SE, NON), separatore ";" e decimali con ",".
+' Il testo tra virgolette non viene toccato e un nome di funzione viene tradotto solo
+' se non e' parte di un identificatore piu' lungo (riferimento di cella, nome, ecc.).
 Function Formula_To_English(ByVal formulaIT As String) As String
-    Dim f As String
-    f = Replace(formulaIT, "E(", "AND(")
-    f = Replace(f, "O(", "OR(")
-    f = Replace(f, ";", ",")
-    f = Replace(f, "0,46", "0.46")
-    Formula_To_English = f
+    Dim res As String
+    Dim ch As String, prev As String, nxt As String
+    Dim tok As String
+    Dim i As Long, j As Long, n As Long
+    Dim inQuote As Boolean
+
+    n = Len(formulaIT)
+    i = 1
+    Do While i <= n
+        ch = Mid$(formulaIT, i, 1)
+        If ch = """" Then
+            inQuote = Not inQuote
+            res = res & ch
+            i = i + 1
+        ElseIf inQuote Then
+            res = res & ch
+            i = i + 1
+        ElseIf ch = ";" Then
+            res = res & ","
+            i = i + 1
+        ElseIf ch = "," Then
+            ' Virgola decimale: tra due cifre
+            If i > 1 And i < n Then
+                prev = Mid$(formulaIT, i - 1, 1)
+                nxt = Mid$(formulaIT, i + 1, 1)
+                If prev Like "#" And nxt Like "#" Then ch = "."
+            End If
+            res = res & ch
+            i = i + 1
+        ElseIf UCase$(ch) Like "[A-Z]" Then
+            ' Legge l'identificatore (lettere, cifre, _ e .)
+            j = i
+            Do While j <= n
+                If Not (UCase$(Mid$(formulaIT, j, 1)) Like "[A-Z0-9_.]") Then Exit Do
+                j = j + 1
+            Loop
+            tok = Mid$(formulaIT, i, j - i)
+            prev = ""
+            If i > 1 Then prev = Mid$(formulaIT, i - 1, 1)
+            If j <= n And prev <> "$" And prev <> "!" And prev <> ":" Then
+                If Mid$(formulaIT, j, 1) = "(" Then
+                    Select Case UCase$(tok)
+                        Case "E": tok = "AND"
+                        Case "O": tok = "OR"
+                        Case "SE": tok = "IF"
+                        Case "NON": tok = "NOT"
+                    End Select
+                End If
+            End If
+            res = res & tok
+            i = j
+        Else
+            res = res & ch
+            i = i + 1
+        End If
+    Loop
+    Formula_To_English = res
 End Function
 
 ' Aggiunge una formattazione condizionale basata su formula.
@@ -586,12 +639,7 @@ End Sub
 ' del foglio indicato (LUN..DOM), altrimenti "". Legge le etichette scritte in TOT
 ' da Check_Days (colonna 4 + 2 * indice giorno, riga del nome in colonna B).
 Public Function Lineare_Assenza(ByVal ws As Worksheet, ByVal WorkerName As String) As String
-    Dim wsTOT As Worksheet
     Dim dayIndex As Integer
-    Dim r As Long, c As Long
-    Dim v As String
-
-    Lineare_Assenza = ""
 
     Select Case ws.name
         Case "LUN": dayIndex = 0
@@ -604,20 +652,32 @@ Public Function Lineare_Assenza(ByVal ws As Worksheet, ByVal WorkerName As Strin
         Case Else: Exit Function
     End Select
 
+    Lineare_Assenza = Lineare_Assenza_Giorno("TOT", dayIndex, WorkerName)
+End Function
+
+' Come Lineare_Assenza, ma per un foglio riepilogo (TOT o TOT-M) e un giorno
+' indicato per indice (0 = LUN .. 6 = DOM). Usata anche dal foglio MANAGER.
+Public Function Lineare_Assenza_Giorno(ByVal TotSheetName As String, ByVal dayIndex As Integer, ByVal WorkerName As String) As String
+    Dim wsTOT As Worksheet
+    Dim r As Long, c As Long, LastRow As Long
+    Dim v As String
+
+    Lineare_Assenza_Giorno = ""
+
     WorkerName = Trim(WorkerName)
     If WorkerName = "" Then Exit Function
+    If dayIndex < 0 Or dayIndex > 6 Then Exit Function
 
     On Error GoTo Fine
-    Set wsTOT = ThisWorkbook.Worksheets("TOT")
+    Set wsTOT = ThisWorkbook.Worksheets(TotSheetName)
     c = 4 + 2 * dayIndex
-    r = 4
-    Do While wsTOT.Cells(r, 2).Value <> "" And r < Rows.Count
+    LastRow = wsTOT.Cells(wsTOT.Rows.Count, 2).End(xlUp).Row
+    For r = 2 To LastRow
         If StrComp(Trim(CStr(wsTOT.Cells(r, 2).Value)), WorkerName, vbTextCompare) = 0 Then
             v = UCase(Trim(CStr(wsTOT.Cells(r, c).Value)))
-            If v = "FERIE" Or v = "MALATTIA" Or v = "CORSO" Then Lineare_Assenza = v
+            If v = "FERIE" Or v = "MALATTIA" Or v = "CORSO" Then Lineare_Assenza_Giorno = v
             Exit Function
         End If
-        r = r + 1
-    Loop
+    Next r
 Fine:
 End Function

@@ -9,7 +9,7 @@ Private Sub Worksheet_Change(ByVal Target As Range)
     If Application.Ready = False Then Exit Sub
     If Application.CommandBars("Cell").Enabled = False Then Exit Sub
     
-    On Error GoTo Cleanup
+    On Error GoTo ErrHandler
     Application.EnableEvents = False
     Application.ScreenUpdating = False
     
@@ -116,12 +116,14 @@ Private Sub Worksheet_Change(ByVal Target As Range)
     Columns(helperCol1 & ":" & helperCol2).EntireColumn.Hidden = True
 
 Cleanup:
-    ' Ripristina sempre lo stato dell'applicazione, anche in caso di errore
+    ' Ripristina sempre lo stato dell'applicazione
     Application.EnableEvents = True
     Application.ScreenUpdating = True
-    If Err.Number <> 0 Then
-        MsgBox "Errore: " & Err.Description, vbCritical + vbOKOnly
-    End If
+    Exit Sub
+
+ErrHandler:
+    MsgBox "Errore: " & Err.Description & " (Codice " & Err.Number & ")", vbCritical + vbOKOnly
+    Resume Cleanup
 End Sub
 
 Private Sub Worksheet_SelectionChange(ByVal Target As Range)
