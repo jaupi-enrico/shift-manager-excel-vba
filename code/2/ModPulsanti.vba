@@ -566,3 +566,43 @@ ErrorHandler:
     Call RestoreAppState
     Exit Sub
 End Sub
+
+' Restituisce "FERIE", "MALATTIA" o "CORSO" se il dipendente e' assente nel giorno
+' del foglio indicato (LUN..DOM), altrimenti "". Legge le etichette scritte in TOT
+' da Check_Days (colonna 4 + 2 * indice giorno, riga del nome in colonna B).
+Public Function Lineare_Assenza(ByVal ws As Worksheet, ByVal WorkerName As String) As String
+    Dim wsTOT As Worksheet
+    Dim dayIndex As Integer
+    Dim r As Long, c As Long
+    Dim v As String
+
+    Lineare_Assenza = ""
+
+    Select Case ws.name
+        Case "LUN": dayIndex = 0
+        Case "MAR": dayIndex = 1
+        Case "MER": dayIndex = 2
+        Case "GIO": dayIndex = 3
+        Case "VEN": dayIndex = 4
+        Case "SAB": dayIndex = 5
+        Case "DOM": dayIndex = 6
+        Case Else: Exit Function
+    End Select
+
+    WorkerName = Trim(WorkerName)
+    If WorkerName = "" Then Exit Function
+
+    On Error GoTo Fine
+    Set wsTOT = ThisWorkbook.Worksheets("TOT")
+    c = 4 + 2 * dayIndex
+    r = 4
+    Do While wsTOT.Cells(r, 2).Value <> "" And r < Rows.Count
+        If StrComp(Trim(CStr(wsTOT.Cells(r, 2).Value)), WorkerName, vbTextCompare) = 0 Then
+            v = UCase(Trim(CStr(wsTOT.Cells(r, c).Value)))
+            If v = "FERIE" Or v = "MALATTIA" Or v = "CORSO" Then Lineare_Assenza = v
+            Exit Function
+        End If
+        r = r + 1
+    Loop
+Fine:
+End Function

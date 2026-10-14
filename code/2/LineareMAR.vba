@@ -658,6 +658,16 @@ Private Sub Handle_Single_Change(ByVal Target As Range)
         ' Imposta la riga originale e il flag per il controllo del nome
         OriginalRow = Target.Row
         Target.Value = UCase(Target.Value)
+        ' Blocca i dipendenti in FERIE / MALATTIA / CORSO in questo giorno
+        Dim AbsenceReason As String
+        AbsenceReason = Lineare_Assenza(Me, CStr(Target.Value))
+        If AbsenceReason <> "" Then
+            MsgBox Target.Value & " è in " & AbsenceReason & " questo giorno e non può essere inserito nel lineare.", vbCritical + vbOKOnly
+            ' Ripristina il nome precedente (se c'era) cosi' il resto del foglio resta coerente
+            Target.Value = content
+            GoTo Cleanup
+        End If
+
 
         With Target
             .HorizontalAlignment = xlCenter
