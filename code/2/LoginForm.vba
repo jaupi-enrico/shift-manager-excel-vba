@@ -3,7 +3,7 @@ Option Explicit
 Private Sub CancelButton_Click()
     ' Definisci la password per proteggere il foglio
     Dim Password
-    Password = "Ej20082018*Excel"
+    Password = SHEET_PASSWORD
     
     ' Torna al foglio DASHBOARD e chiudi il form
     Worksheets("DASHBOARD").Activate
@@ -16,9 +16,9 @@ End Sub
 Private Sub EnterButton_Click()
     ' Definisci la password per proteggere il foglio
     Dim Password
-    Password = "Ej20082018*Excel"
+    Password = SHEET_PASSWORD
     
-    Const CorrectPassword As String = "1996" ' Password corretta
+    Const CorrectPassword As String = LOGIN_PIN
     If Trim(PasswordBox.Value) = CorrectPassword Then
         Worksheets("Tabelle").Unprotect Password:=Password
         Worksheets("Tabelle").Range("H3").Value = 1
@@ -37,7 +37,7 @@ End Sub
 Private Sub UserForm_Activate()
     ' Definisci la password per proteggere il foglio
     Dim Password
-    Password = "Ej20082018*Excel"
+    Password = SHEET_PASSWORD
     
     Worksheets("Tabelle").Unprotect Password:=Password
     ' Reimposta lo stato di login quando il form viene mostrato
