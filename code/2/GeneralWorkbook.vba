@@ -12,7 +12,7 @@ Private Sub Workbook_BeforeClose(Cancel As Boolean)
     Changed = False
     Answer = MsgBox("Vuoi salvare?", vbYesNoCancel + vbQuestion + vbDefaultButton1)
     Dim Password As String
-    Password = "Ej20082018*Excel"
+    Password = SHEET_PASSWORD
     
     If Answer = vbYes Then
         Application.ScreenUpdating = False
@@ -64,7 +64,7 @@ End Sub
 
 Private Sub Workbook_BeforeSave(ByVal SaveAsUI As Boolean, Cancel As Boolean)
     Dim Password As String
-    Password = "Ej20082018*Excel"
+    Password = SHEET_PASSWORD
     If Closing = True And Changed = False Then
         Worksheets(1).Activate
         For Each sheet In Worksheets
@@ -89,7 +89,7 @@ End Sub
 Private Sub Workbook_Open()
     On Error Resume Next
     Dim Password As String
-    Password = "Ej20082018*Excel"
+    Password = SHEET_PASSWORD
     For Each sheet In Worksheets
         sheet.Unprotect Password:=Password
         If sheet.name = "LUN" Or _
@@ -109,14 +109,16 @@ Private Sub Workbook_Open()
         End If
     Next sheet
     Worksheets(1).Activate
-    Call AggiornaCodiceVBA
+    ' Esegue l'aggiornamento a Workbook_Open concluso, cosi' nessun modulo
+    ' viene riscritto mentre e' ancora in esecuzione
+    Application.OnTime Now + TimeSerial(0, 0, 2), "'" & ThisWorkbook.name & "'!AggiornaCodiceVBA"
     On Error GoTo 0
 End Sub
 
 Private Sub Workbook_SheetActivate(ByVal Sh As Object)
     Dim ProtectedSheets As Variant
     Dim Password As String
-    Password = "Ej20082018*Excel"
+    Password = SHEET_PASSWORD
     ProtectedSheets = Array("Fasce_Tot", "Percentuali", "Tabelle", "Dipendenti", "Dipendenti-M") ' Elenco dei fogli protetti
     
     If Not IsError(Application.Match(Sh.name, ProtectedSheets, 0)) Then

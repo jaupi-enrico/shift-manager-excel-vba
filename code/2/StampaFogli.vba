@@ -1,3 +1,5 @@
+Option Explicit
+
 Sub StampaFogliSovrapposti()
     Dim ws1 As Worksheet, ws2 As Worksheet
     Dim wsTemp As Worksheet, ws2copy As Worksheet
