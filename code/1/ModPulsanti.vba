@@ -1,13 +1,69 @@
 Option Explicit
 Dim sheet As Worksheet ' Dichiarazione variabile sheet
 
+' Password di protezione dei fogli: unico punto in cui e' definita
+Public Const SHEET_PASSWORD As String = "Ej20082018*Excel"
+' PIN richiesto dal LoginForm per i fogli riservati
+Public Const LOGIN_PIN As String = "1996"
+
+' Ripristina lo stato dell'applicazione dopo operazioni lunghe o errori
+Sub RestoreAppState()
+    On Error Resume Next
+    Application.StatusBar = False
+    Application.ScreenUpdating = True
+    Application.EnableEvents = True
+    Application.Calculation = xlCalculationAutomatic
+    Application.DisplayAlerts = True
+    Application.CutCopyMode = False
+End Sub
+
+' Assegna una formula "dinamica" (Formula2) e, se la versione di Excel
+' non la supporta (prima del 365), ripiega su Formula
+Sub Set_Formula_Compat(ByVal rng As Range, ByVal formulaEN As String)
+    On Error Resume Next
+    rng.Formula2 = formulaEN
+    If Err.Number <> 0 Then
+        Err.Clear
+        On Error GoTo 0
+        rng.Formula = formulaEN
+    End If
+    On Error GoTo 0
+End Sub
+
+' Converte una formula italiana usata nelle formattazioni condizionali
+' (E/O, separatore ";", decimali con ",") nell'equivalente inglese
+Function Formula_To_English(ByVal formulaIT As String) As String
+    Dim f As String
+    f = Replace(formulaIT, "E(", "AND(")
+    f = Replace(f, "O(", "OR(")
+    f = Replace(f, ";", ",")
+    f = Replace(f, "0,46", "0.46")
+    Formula_To_English = f
+End Function
+
+' Aggiunge una formattazione condizionale basata su formula.
+' Prova prima la sintassi italiana (quella usata finora), poi quella inglese
+' (Excel con impostazioni regionali diverse)
+Function Add_Cond_Format(ByVal rng As Range, ByVal formulaIT As String) As FormatCondition
+    Dim fc As FormatCondition
+    On Error Resume Next
+    Set fc = rng.FormatConditions.Add(Type:=xlExpression, Formula1:=formulaIT)
+    If fc Is Nothing Then
+        Err.Clear
+        On Error GoTo 0
+        Set fc = rng.FormatConditions.Add(Type:=xlExpression, Formula1:=Formula_To_English(formulaIT))
+    End If
+    On Error GoTo 0
+    Set Add_Cond_Format = fc
+End Function
+
 Sub ShowSheets()
     Dim Password As String
     Dim sheet As Worksheet
     Dim currentSheet As Worksheet
 
     Application.ScreenUpdating = False
-    Password = "Ej20082018*Excel"
+    Password = SHEET_PASSWORD
     Set currentSheet = ActiveSheet
 
     For Each sheet In Worksheets
@@ -27,7 +83,7 @@ Sub HideSheets()
     Dim currentSheet As Worksheet
 
     Application.ScreenUpdating = False
-    Password = "Ej20082018*Excel"
+    Password = SHEET_PASSWORD
     Set currentSheet = ActiveSheet
 
     For Each sheet In Worksheets
@@ -68,6 +124,7 @@ End Sub
 
 Sub Delete_names()
     Call ShowSheets
+    On Error GoTo ErrHandler
     Dim Answer As Long
     Answer = MsgBox("Sei sicuro di togliere i nomi?", vbYesNo + vbDefaultButton2)
         
@@ -190,26 +247,33 @@ Sub Delete_names()
                         sheet.Cells(OriginalRow, 1).Interior.color = RGB(217, 217, 217)
                     End If
                     
-                    ' Cancella contenuti se necessario
-                    For Each cell In sheet.Range(sheet.Cells(OriginalRow - 1, columnI), sheet.Cells(OriginalRow - 1, columnF))
-                        If cell.Value <> "" And cell.Value = content Then
-                            cell.ClearContents
-                        End If
-                    Next cell
+                    ' Cancella contenuti se necessario (solo se la riga ha sia "I" che "F")
+                    If columnI > 0 And columnF > 0 Then
+                        For Each cell In sheet.Range(sheet.Cells(OriginalRow - 1, columnI), sheet.Cells(OriginalRow - 1, columnF))
+                            If cell.Value <> "" And cell.Value = content Then
+                                cell.ClearContents
+                            End If
+                        Next cell
+                    End If
                     End If
                 Next name
             End If
         Next sheet
     End If
 Cleanup:
-        
+    On Error Resume Next
     columnF = 0
     columnI = 0
     
     Call HideSheets
 
     ' Riabilita gli eventi
-     Application.EnableEvents = True
+    Application.EnableEvents = True
+    Exit Sub
+
+ErrHandler:
+    MsgBox "Errore: " & Err.Description & " (Codice " & Err.Number & ")", vbCritical
+    Resume Cleanup
 End Sub
 
 Sub Show_Lines()
@@ -273,6 +337,9 @@ Exit Sub
 
 ErrorHandler:
     MsgBox "Errore: " & Err.Description & " (Codice " & Err.Number & ") nel foglio " & sheet.name, vbCritical
+    On Error Resume Next
+    Call HideSheets
+    Call RestoreAppState
     Exit Sub
 End Sub
 
@@ -289,6 +356,7 @@ Sub Hide_Lines()
     Dim clear_down_down As Boolean
     
     Call ShowSheets
+    Application.ScreenUpdating = False
     
     On Error GoTo ErrorHandler ' Gestione degli errori
     
@@ -365,7 +433,7 @@ Sub Hide_Lines()
                         
                         If cell_y.Row < sheet.Rows.Count - 1 And clear_down Then ' Evita di andare oltre l'ultima riga
                             For Each cell_x In line
-                                If sheet.Cells(cell_x.Row + 1, cell_x.Column).Value <> "" Then
+                                If sheet.Cells(cell_x.Row + 2, cell_x.Column).Value <> "" Then
                                     clear_down_down = False
                                     Exit For
                                 End If
@@ -456,7 +524,7 @@ Sub Hide_Lines()
                         
                         If cell_y.Row < sheet.Rows.Count - 1 And clear_down Then ' Evita di andare oltre l'ultima riga
                             For Each cell_x In line
-                                If sheet.Cells(cell_x.Row + 1, cell_x.Column).Value <> "" Then
+                                If sheet.Cells(cell_x.Row + 2, cell_x.Column).Value <> "" Then
                                     clear_down_down = False
                                     Exit For
                                 End If
@@ -493,5 +561,8 @@ Exit Sub
 
 ErrorHandler:
     MsgBox "Errore: " & Err.Description & " (Codice " & Err.Number & ") nel foglio " & sheet.name, vbCritical
+    On Error Resume Next
+    Call HideSheets
+    Call RestoreAppState
     Exit Sub
 End Sub
