@@ -18,7 +18,8 @@ Private Sub EnterButton_Click()
     Dim Password
     Password = SHEET_PASSWORD
     
-    Const CorrectPassword As String = LOGIN_PIN
+    Dim CorrectPassword As String
+    CorrectPassword = LOGIN_PIN
     If Trim(PasswordBox.Value) = CorrectPassword Then
         Worksheets("Tabelle").Unprotect Password:=Password
         Worksheets("Tabelle").Range("H3").Value = 1

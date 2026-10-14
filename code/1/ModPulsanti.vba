@@ -1,10 +1,25 @@
 Option Explicit
 Dim sheet As Worksheet ' Dichiarazione variabile sheet
 
-' Password di protezione dei fogli: unico punto in cui e' definita
-Public Const SHEET_PASSWORD As String = "Ej20082018*Excel"
-' PIN richiesto dal LoginForm per i fogli riservati
-Public Const LOGIN_PIN As String = "1996"
+' Password di protezione dei fogli e PIN del LoginForm: unico punto in cui sono definiti.
+' Sono offuscati (XOR) per non comparire in chiaro nel codice; sono funzioni senza parametri,
+' quindi si usano come prima (Password = SHEET_PASSWORD).
+Private Function Deobfuscate(codes As Variant, seed As Long) As String
+    Dim i As Long
+    Dim s As String
+    For i = LBound(codes) To UBound(codes)
+        s = s & Chr$(CLng(codes(i)) Xor ((seed + (i - LBound(codes)) * 7) Mod 251))
+    Next i
+    Deobfuscate = s
+End Function
+
+Public Function SHEET_PASSWORD() As String
+    SHEET_PASSWORD = Deobfuscate(Array(24, 14, 89, 66, 73, 184, 181, 190, 164, 164, 137, 239, 201, 219, 218, 170), 93)
+End Function
+
+Public Function LOGIN_PIN() As String
+    LOGIN_PIN = Deobfuscate(Array(24, 9, 14, 8), 41)
+End Function
 
 ' Ripristina lo stato dell'applicazione dopo operazioni lunghe o errori
 Sub RestoreAppState()
