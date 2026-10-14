@@ -100,12 +100,10 @@ Private Sub Workbook_Open()
             sheet.name = "SAB" Or _
             sheet.name = "DOM" Then
                 sheet.Activate
-                Range("F16").Activate
-                ActiveWindow.FreezePanes = True
+                Freeze_Safe 16, 6
         ElseIf sheet.name = "MANAGER" Then
             sheet.Activate
-            Range("F2").Activate
-            ActiveWindow.FreezePanes = True
+            Freeze_Safe 2, 6
         End If
     Next sheet
     Worksheets(1).Activate
@@ -113,6 +111,21 @@ Private Sub Workbook_Open()
     ' viene riscritto mentre e' ancora in esecuzione
     Application.OnTime Now + TimeSerial(0, 0, 2), "'" & ThisWorkbook.name & "'!AggiornaCodiceVBA"
     On Error GoTo 0
+End Sub
+
+' Blocca righe e colonne; se le colonne bloccate occupano piu' di meta' finestra
+' (finestra stretta) blocca solo le righe, cosi' si puo' scorrere a sinistra
+Private Sub Freeze_Safe(ByVal firstRow As Long, ByVal firstCol As Long)
+    Dim frozenWidth As Double
+    Dim colsToFreeze As Long
+    ActiveWindow.FreezePanes = False
+    ActiveWindow.ScrollRow = 1
+    ActiveWindow.ScrollColumn = 1
+    frozenWidth = ActiveSheet.Range(ActiveSheet.Cells(1, 1), ActiveSheet.Cells(1, firstCol - 1)).Width
+    colsToFreeze = firstCol
+    If frozenWidth > ActiveWindow.UsableWidth / 2 Then colsToFreeze = 1
+    ActiveSheet.Cells(firstRow, colsToFreeze).Select
+    ActiveWindow.FreezePanes = True
 End Sub
 
 Private Sub Workbook_SheetActivate(ByVal Sh As Object)
