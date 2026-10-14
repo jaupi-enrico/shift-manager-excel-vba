@@ -3,7 +3,7 @@ Option Explicit
 ' Ramo GitHub da cui viene scaricato il codice.
 ' ATTENZIONE: "main" e' il ramo distribuito a tutti gli utenti. Un ramo di prova
 ' va usato solo su copie di test del file e deve tornare a "main" prima del merge.
-Private Const UPDATE_BRANCH As String = "merge/no-ui-alerts"
+Private Const UPDATE_BRANCH As String = "main"
 Private Const UPDATE_BASE_URL As String = "https://raw.githubusercontent.com/jaupi-enrico/shift-manager-excel-vba/"
 
 ' Aggiorna il codice VBA dei moduli dal repository GitHub.

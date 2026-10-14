@@ -21,7 +21,7 @@ Every deployed workbook runs `Updater.AggiornaCodiceVBA` on open and pulls the m
   - `1b60f04` `CLAUDE.md`
 
 ## IMPORTANT before merging to main
-- `Updater.vba` (code/1 and code/2) has `UPDATE_BRANCH = "merge/no-ui-alerts"` (test copy). **Change it back to `"main"` before any merge.**
+- `Updater.vba` (code/1 and code/2) has `UPDATE_BRANCH = "main"`, ready to merge.
 
 ## What was changed
 | Area | Change |
@@ -66,7 +66,7 @@ Every deployed workbook runs `Updater.AggiornaCodiceVBA` on open and pulls the m
 ## Next steps
 - Test on a copy and report results; fix whatever fails (on this branch).
 - Decide on password/PIN, `Lineare*` consolidation, and `ApplyChanges`.
-- When the owner says so: re-run `diff -r code/1 code/2` and set `UPDATE_BRANCH` back to `"main"`, then open the PR.
+- When the owner says so: re-run `diff -r code/1 code/2` then open the PR.
 
 ## Code-review fixes (latest round)
 - `Formula_To_English` is now a small tokenizer (E/O/SE/NON, `;`, decimal commas, quoted text untouched); callers skip the format if `Add_Cond_Format` returns `Nothing`.
