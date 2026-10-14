@@ -1,6 +1,12 @@
-# Status: branch `fix/review-findings`
+# Status: branch `merge/no-ui-alerts`
 
-Last updated: 2026-10-14. Nothing here has been run in Excel yet. No PR exists and none must be opened until the owner says so.
+Last updated: 2026-10-14. All planned code work is done and merged into this branch. Nothing has been run in Excel yet. No PR exists and none must be opened until the owner says so.
+
+## Done (all merged into this branch)
+- `fix/review-findings`: the code-review fixes (details below).
+- `worktree-block-absent-workers`: `Lineare_Assenza` in `ModPulsanti`; `LineareLUN..DOM` reject a worker who is on FERIE/MALATTIA/CORSO that day. `MANAGER` unchanged. Also the freeze-panes fix (skipped when the window is too narrow) in `GeneralWorkbook`.
+- `LineareMAR`: `Worksheet_Change` dispatches to `Handle_Single_Change` / `Handle_Multi_Change`, so block delete/paste works instead of being rejected.
+- `obfuscate-password`: sheet password and login PIN are XOR-encoded and exposed as functions (`ModPulsanti`, `LoginForm`). They are no longer plain text in the repo.
 
 ## Why this branch exists
 Every deployed workbook runs `Updater.AggiornaCodiceVBA` on open and pulls the modules from `main`, so anything merged to `main` ships to all users at once. All fixes from the code review live on this branch and are to be tested on a **copy** of `gestionale.xlsm` first.
@@ -15,7 +21,7 @@ Every deployed workbook runs `Updater.AggiornaCodiceVBA` on open and pulls the m
   - `1b60f04` `CLAUDE.md`
 
 ## IMPORTANT before merging to main
-- `Updater.vba` has `Private Const UPDATE_BRANCH As String = "fix/review-findings"`. **Change it back to `"main"` before any merge**, otherwise every user's workbook would start pulling from this branch.
+- `Updater.vba` (code/1 and code/2) has `Private Const UPDATE_BRANCH As String = "merge/no-ui-alerts"` (commit `acb83a1`, for the test copy). **Change it back to `"main"` before any merge**, otherwise every user's workbook would start pulling from this branch.
 
 ## What was changed
 | Area | Change |
@@ -36,12 +42,12 @@ Every deployed workbook runs `Updater.AggiornaCodiceVBA` on open and pulls the m
 - The `.vba` files are UTF-8. The updater decodes UTF-8, so accents work. `CLAUDE.md` was corrected.
 
 ## What was NOT done
-- Not run in Excel. Only block balance (`Sub`/`If`/`For`/`With`) was compared against the original files.
-- The password (`Ej20082018*Excel`) and PIN (`1996`) are still in the public repo, now only in one place. Owner's decision: rotate them or keep them.
+- Not run in Excel. The merged branches are also untested. Only block balance (`Sub`/`If`/`For`/`With`) was compared against the original files.
+- The password and PIN are now obfuscated, not secure: anyone can decode them from the repo. Rotate them if that matters, since the old values stay in the commit history.
 - `Lineare*` consolidation (8 near-identical modules into one) is not done. It is the riskiest change, so do it only after this round is tested.
 - `Changes.ApplyChanges` is still never called.
 - `ModTotaloneManager.vba`: the diff against `ModTotalone.vba` was only partly reviewed.
-- The multi-cell guard in `Lineare*` now blocks selecting a block of shift cells and pressing Delete. Confirm this is acceptable.
+- The multi-cell guard in `Lineare*` blocks block-delete on all sheets except `LineareMAR`, which now handles it. Decide whether to port that to the others.
 - A module may be "different" every time if the VBE rewrites identifier casing, so it would be re-replaced on every open. This is no worse than before, but check it.
 
 ## Test plan (Windows, on a copy)
@@ -54,9 +60,10 @@ Every deployed workbook runs `Updater.AggiornaCodiceVBA` on open and pulls the m
 7. Day sheets and MANAGER: edit I/F times, the 6:00 and 6:30 prompts, a duplicate name, Delete over a block (expect the message), `Hide_Lines` / `Show_Lines`.
 8. MANAGER: `Delete_names` with a row that has a name but no I/F.
 9. Close the workbook: Yes saves, No closes without saving, Cancel stays open.
-10. If possible, run on a non-Italian Excel (locale fixes) and on Excel before 365 (`Formula2` fallback).
+10. Day sheets: enter a worker who is on FERIE/MALATTIA/CORSO that day (expect an error and the cell restored). On `LineareMAR`, block delete and paste.
+11. If possible, run on a non-Italian Excel (locale fixes) and on Excel before 365 (`Formula2` fallback).
 
 ## Next steps
-- Report test results and fix whatever fails (on this branch).
+- Test on a copy and report results; fix whatever fails (on this branch).
 - Decide on password/PIN, `Lineare*` consolidation, and `ApplyChanges`.
 - When the owner says so: set `UPDATE_BRANCH` back to `"main"`, re-run `diff -r code/1 code/2`, then open the PR.
