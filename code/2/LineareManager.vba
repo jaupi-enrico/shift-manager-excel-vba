@@ -63,7 +63,7 @@ Function Find_Name_Column()
                     ColumnName = ColumnNameTemp + i
 
                     If ColumnName = columnI - 1 Then
-                        MsgBox "Tutte le colonne sono occupate, libera spazio per visulizzare il nome!", vbCritical + vbOKOnly + vbDefaultButton1
+                        MsgBox "Tutte le colonne sono occupate, libera spazio per visualizzare il nome!", vbCritical + vbOKOnly + vbDefaultButton1
                         AllColumnsOccupied = True
                         Exit Do
                     End If
@@ -169,7 +169,7 @@ End Function
 Private Sub Worksheet_SelectionChange(ByVal Target As Range)
     ' Definisci la password per proteggere il foglio
     Dim Password
-    Password = "Ej20082018*Excel"
+    Password = SHEET_PASSWORD
     ' Definisci gli intervalli di celle
     ' che devono essere de-protetti
     Set rngC = Range("C2:C148")
@@ -215,6 +215,7 @@ Private Sub Worksheet_Change(ByVal Target As Range)
     ' Inizializza le variabili
     columnF = 0
     columnI = 0
+    OriginalRow = 0
     
     ' Definisci gli intervalli di celle
     ' che devono essere monitorati per le modifiche
@@ -230,6 +231,15 @@ Private Sub Worksheet_Change(ByVal Target As Range)
     ' Tempo speso = 5 Ore
     If Application.Ready = False Then Exit Sub
     If Application.CommandBars("Cell").Enabled = False Then Exit Sub
+
+    ' Modifiche su piu' celle (incolla, cancella un intervallo) non sono gestite:
+    ' le celle unite contano come una sola modifica
+    If Target.Cells.Count > 1 Then
+        If Target.Cells(1, 1).MergeArea.Address <> Target.Address Then
+            MsgBox "Modifica una cella alla volta: incolla e cancellazione multipla non sono supportate.", vbExclamation
+            Exit Sub
+        End If
+    End If
 
     ' Disabilita temporaneamente gli eventi
     Application.EnableEvents = False
@@ -605,6 +615,7 @@ Cleanup:
     ' Ripristina le variabili globali
     columnF = 0
     columnI = 0
+    OriginalRow = 0
     
     ' Riabilita gli eventi, anche in caso di errore
     Application.EnableEvents = True

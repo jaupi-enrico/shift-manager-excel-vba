@@ -64,7 +64,7 @@ Function Find_Name_Column()
                     ColumnName = ColumnNameTemp + i
 
                     If ColumnName = columnI - 1 Then
-                        MsgBox "Tutte le colonne sono occupate, libera spazio per visulizzare il nome!", vbCritical + vbOKOnly + vbDefaultButton1
+                        MsgBox "Tutte le colonne sono occupate, libera spazio per visualizzare il nome!", vbCritical + vbOKOnly + vbDefaultButton1
                         AllColumnsOccupied = True
                         Exit Do
                     End If
@@ -170,7 +170,7 @@ End Function
 Private Sub Worksheet_SelectionChange(ByVal Target As Range)
     ' Definisci la password per proteggere il foglio
     Dim Password
-    Password = "Ej20082018*Excel"
+    Password = SHEET_PASSWORD
     ' Definisci gli intervalli di celle
     ' che devono essere de-protetti
     Set rngC = Range("C17:C164")
@@ -219,6 +219,7 @@ Private Sub Worksheet_Change(ByVal Target As Range)
     ' Inizializza le variabili
     columnF = 0
     columnI = 0
+    OriginalRow = 0
     
     ' Definisci gli intervalli di celle
     ' che devono essere monitorati per le modifiche
@@ -233,6 +234,15 @@ Private Sub Worksheet_Change(ByVal Target As Range)
     ' Tempo speso = 5 Ore
     If Application.Ready = False Then Exit Sub
     If Application.CommandBars("Cell").Enabled = False Then Exit Sub
+
+    ' Modifiche su piu' celle (incolla, cancella un intervallo) non sono gestite:
+    ' le celle unite contano come una sola modifica
+    If Target.Cells.Count > 1 Then
+        If Target.Cells(1, 1).MergeArea.Address <> Target.Address Then
+            MsgBox "Modifica una cella alla volta: incolla e cancellazione multipla non sono supportate.", vbExclamation
+            Exit Sub
+        End If
+    End If
 
     ' Disabilita temporaneamente gli eventi
     Application.EnableEvents = False
@@ -323,7 +333,7 @@ Private Sub Worksheet_Change(ByVal Target As Range)
     If Not IsError(Application.Evaluate(content)) Then
         Target.Formula = content
     Else
-        MsgBox "Errore: La formula salvata non ? valida."
+        MsgBox "Errore: La formula salvata non è valida."
     End If
 
     ' Definisci l'intervallo in cui vuoi cercare (ad esempio, la riga 1)
@@ -414,7 +424,7 @@ Private Sub Worksheet_Change(ByVal Target As Range)
     
     ' Errore se la collona di I ? maggiore della colonna di F
     If columnI > 0 And columnF > 0 And columnI > columnF Then
-        MsgBox "Errore: L'ora di inizio ? dopo quella di fine.", vbRetryCancel + vbCritical
+        MsgBox "Errore: L'ora di inizio è dopo quella di fine.", vbRetryCancel + vbCritical
         ' Cancella il nome se gi? presente
         Call CancelName(Target)
         Cells(OriginalRow, columnF).Value = ""
@@ -538,7 +548,7 @@ NameChange:
     If CheckName And Cells(OriginalRow, 1).Value <> "" Then
         For Each cell In Range(Cells(16, 1), Cells(165, 1))
             If cell.Value = Cells(OriginalRow, 1).Value And cell.Address <> Cells(OriginalRow, 1).Address Then
-                AnswerQuestion = MsgBox("Nome gi? inserito", vbCritical + vbRetryCancel + vbDefaultButton1)
+                AnswerQuestion = MsgBox("Nome già inserito", vbCritical + vbRetryCancel + vbDefaultButton1)
                 If AnswerQuestion = vbRetry Then
                     Cells(OriginalRow, 1).ClearContents
                 ElseIf AnswerQuestion = vbCancel Then
@@ -598,6 +608,7 @@ Cleanup:
     ' Ripristina le variabili globali
     columnF = 0
     columnI = 0
+    OriginalRow = 0
     
     ' Riabilita gli eventi, anche in caso di errore
     Application.EnableEvents = True
