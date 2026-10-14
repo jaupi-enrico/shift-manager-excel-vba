@@ -4,8 +4,9 @@ Private Sub Worksheet_Activate()
     Dim Password As String
     Dim LastRow As Integer
 
-    Password = "Ej20082018*Excel"
+    Password = SHEET_PASSWORD
     Me.Unprotect Password:=Password
+    On Error GoTo ErrHandler
 
     LastRow = 4
     While Me.Cells(LastRow, 1).Value <> ""
@@ -18,17 +19,26 @@ Private Sub Worksheet_Activate()
         Exit Sub
     End If
 
-    Me.Cells(LastRow + 1, 28).FormulaLocal = "=SOMMA(AB4:AB" & LastRow & ")"
-    Me.Cells(LastRow + 2, 28).FormulaLocal = "=SOMMA(AA4:AA" & LastRow & ")"
+    Me.Cells(LastRow + 1, 28).Formula = "=SUM(AB4:AB" & LastRow & ")"
+    Me.Cells(LastRow + 2, 28).Formula = "=SUM(AA4:AA" & LastRow & ")"
     
     Me.Protect Password:=Password
+    Exit Sub
+
+ErrHandler:
+    ' Il foglio e' stato sbloccato: riproteggilo anche in caso di errore
+    Dim ErrMsg As String
+    ErrMsg = Err.Description
+    On Error Resume Next
+    Me.Protect Password:=Password
+    MsgBox "Errore nell'aggiornamento dei totali: " & ErrMsg, vbExclamation
 End Sub
 
 Private Sub Worksheet_SelectionChange(ByVal Target As Range)
     Dim Password
     Dim rngPermessi As Range
     Dim LastRow As Integer
-    Password = "Ej20082018*Excel"
+    Password = SHEET_PASSWORD
     
     LastRow = 4
     While Cells(LastRow, 1).Value <> ""

@@ -328,10 +328,12 @@ Sub UpdateFormatConditions()
                  ")"
         
         ' Applica la regola
-        Set fc = rngTemp.FormatConditions.Add(Type:=xlExpression, Formula1:=formula)
-        fc.Interior.color = RGB(255, 0, 0) ' Rosso
-        fc.Font.Bold = True
-        fc.Font.color = RGB(255, 255, 255) ' Bianco
+        Set fc = Add_Cond_Format(rngTemp, formula)
+        If Not fc Is Nothing Then
+            fc.Interior.color = RGB(255, 0, 0) ' Rosso
+            fc.Font.Bold = True
+            fc.Font.color = RGB(255, 255, 255) ' Bianco
+        End If
     Next i
 
     For i = 0 To 4
@@ -348,10 +350,12 @@ Sub UpdateFormatConditions()
                   "O(E($" & col1 & "4>$" & col2 & "4;$" & col4 & "4-$" & col2 & "4<0,46);" & _
                   "E($" & col1 & "4<$" & col2 & "4;(1-$" & col2 & "4)+$" & col4 & "4<0,46)))"
         ' Applica la regola
-        Set fc = rngTemp.FormatConditions.Add(Type:=xlExpression, Formula1:=formula)
-        fc.Interior.color = RGB(255, 0, 0) ' Rosso
-        fc.Font.Bold = True
-        fc.Font.color = RGB(255, 255, 255) ' Bianco
+        Set fc = Add_Cond_Format(rngTemp, formula)
+        If Not fc Is Nothing Then
+            fc.Interior.color = RGB(255, 0, 0) ' Rosso
+            fc.Font.Bold = True
+            fc.Font.color = RGB(255, 255, 255) ' Bianco
+        End If
     Next i
 
     Set fc = rng.FormatConditions.Add(Type:=xlCellValue, Operator:=xlEqual, Formula1:="=""OFF""")
@@ -371,13 +375,13 @@ Sub FixErrorsDays()
             For Each cell In ws.Range("B2:B148")
                 If cell.Interior.color = RGB(217, 217, 217) Then
                     ' Formula for total hours (column B)
-                    cell.Formula2 = "=IFERROR(D" & cell.Row & "-C" & cell.Row & "+IF(C" & cell.Row & ">=D" & cell.Row & ",1),0)*24"
+                    Call Set_Formula_Compat(cell, "=IFERROR(D" & cell.Row & "-C" & cell.Row & "+IF(C" & cell.Row & ">=D" & cell.Row & ",1),0)*24")
                     
                     ' Formula for "I" time (column C)
-                    cell.Offset(0, 1).Formula2 = "=IFERROR(TIMEVALUE(INDEX($H$1:$BT$1,MATCH(""I"",$H" & cell.Row & ":$BT" & cell.Row & ",0))),""OFF"")"
+                    Call Set_Formula_Compat(cell.Offset(0, 1), "=IFERROR(TIMEVALUE(INDEX($H$1:$BT$1,MATCH(""I"",$H" & cell.Row & ":$BT" & cell.Row & ",0))),""OFF"")")
                     
                     ' Formula for "F" time (column D)
-                    cell.Offset(0, 2).Formula2 = "=IFERROR(TIMEVALUE(INDEX($H$1:$BT$1,MATCH(""F"",$H" & cell.Row & ":$BT" & cell.Row & ",0))),""OFF"")"
+                    Call Set_Formula_Compat(cell.Offset(0, 2), "=IFERROR(TIMEVALUE(INDEX($H$1:$BT$1,MATCH(""F"",$H" & cell.Row & ":$BT" & cell.Row & ",0))),""OFF"")")
                 End If
             Next cell
         End If
@@ -391,6 +395,7 @@ Sub Update_Workers_M()
     Update.Show vbModeless
     DoEvents ' Permette il disegno della form prima di proseguire
 
+    On Error GoTo ErrHandler
     Application.ScreenUpdating = False
     Application.EnableEvents = False
     Application.Calculation = xlCalculationManual
@@ -457,6 +462,16 @@ Sub Update_Workers_M()
 
     ' Mostra un messaggio di completamento
     MsgBox "Aggiornamento completato", vbInformation, "Aggiornamento lavoratori"
+    Exit Sub
+
+ErrHandler:
+    Dim ErrMsg As String
+    ErrMsg = Err.Description & " (Codice " & Err.Number & ")"
+    On Error Resume Next
+    Call RestoreAppState
+    Call HideSheets
+    Update.Hide
+    MsgBox "Aggiornamento interrotto alla riga " & Worker & " di Dipendenti-M:" & vbCrLf & ErrMsg, vbCritical, "Aggiornamento lavoratori"
 End Sub
 
 Sub PrintRange_M()

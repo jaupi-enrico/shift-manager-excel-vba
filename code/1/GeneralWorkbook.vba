@@ -12,7 +12,7 @@ Private Sub Workbook_BeforeClose(Cancel As Boolean)
     Changed = False
     Answer = MsgBox("Vuoi salvare?", vbYesNoCancel + vbQuestion + vbDefaultButton1)
     Dim Password As String
-    Password = "Ej20082018*Excel"
+    Password = SHEET_PASSWORD
     
     If Answer = vbYes Then
         Application.ScreenUpdating = False
@@ -64,7 +64,7 @@ End Sub
 
 Private Sub Workbook_BeforeSave(ByVal SaveAsUI As Boolean, Cancel As Boolean)
     Dim Password As String
-    Password = "Ej20082018*Excel"
+    Password = SHEET_PASSWORD
     If Closing = True And Changed = False Then
         Worksheets(1).Activate
         For Each sheet In Worksheets
@@ -89,7 +89,7 @@ End Sub
 Private Sub Workbook_Open()
     On Error Resume Next
     Dim Password As String
-    Password = "Ej20082018*Excel"
+    Password = SHEET_PASSWORD
     For Each sheet In Worksheets
         sheet.Unprotect Password:=Password
         If sheet.name = "LUN" Or _
@@ -100,23 +100,43 @@ Private Sub Workbook_Open()
             sheet.name = "SAB" Or _
             sheet.name = "DOM" Then
                 sheet.Activate
-                Range("F16").Activate
-                ActiveWindow.FreezePanes = True
+                Freeze_Safe 16, 6
         ElseIf sheet.name = "MANAGER" Then
             sheet.Activate
-            Range("F2").Activate
-            ActiveWindow.FreezePanes = True
+            Freeze_Safe 2, 6
         End If
     Next sheet
     Worksheets(1).Activate
-    Call AggiornaCodiceVBA
+    ' Esegue l'aggiornamento a Workbook_Open concluso, cosi' nessun modulo
+    ' viene riscritto mentre e' ancora in esecuzione
+    Err.Clear
+    Application.OnTime Now + TimeSerial(0, 0, 2), "'" & Replace(ThisWorkbook.name, "'", "''") & "'!AggiornaCodiceVBA"
+    If Err.Number <> 0 Then
+        MsgBox "Impossibile pianificare l'aggiornamento automatico del codice: " & Err.Description, vbExclamation
+        Err.Clear
+    End If
     On Error GoTo 0
+End Sub
+
+' Blocca righe e colonne; se le colonne bloccate occupano piu' di meta' finestra
+' (finestra stretta) blocca solo le righe, cosi' si puo' scorrere a sinistra
+Private Sub Freeze_Safe(ByVal firstRow As Long, ByVal firstCol As Long)
+    Dim frozenWidth As Double
+    Dim colsToFreeze As Long
+    ActiveWindow.FreezePanes = False
+    ActiveWindow.ScrollRow = 1
+    ActiveWindow.ScrollColumn = 1
+    frozenWidth = ActiveSheet.Range(ActiveSheet.Cells(1, 1), ActiveSheet.Cells(1, firstCol - 1)).Width
+    colsToFreeze = firstCol
+    If frozenWidth > ActiveWindow.UsableWidth / 2 Then colsToFreeze = 1
+    ActiveSheet.Cells(firstRow, colsToFreeze).Select
+    ActiveWindow.FreezePanes = True
 End Sub
 
 Private Sub Workbook_SheetActivate(ByVal Sh As Object)
     Dim ProtectedSheets As Variant
     Dim Password As String
-    Password = "Ej20082018*Excel"
+    Password = SHEET_PASSWORD
     ProtectedSheets = Array("Fasce_Tot", "Percentuali", "Tabelle", "Dipendenti", "Dipendenti-M") ' Elenco dei fogli protetti
     
     If Not IsError(Application.Match(Sh.name, ProtectedSheets, 0)) Then

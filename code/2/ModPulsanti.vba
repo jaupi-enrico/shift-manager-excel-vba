@@ -1,13 +1,137 @@
 Option Explicit
 Dim sheet As Worksheet ' Dichiarazione variabile sheet
 
+' Password di protezione dei fogli e PIN del LoginForm: unico punto in cui sono definiti.
+' Sono offuscati (XOR) per non comparire in chiaro nel codice; sono funzioni senza parametri,
+' quindi si usano come prima (Password = SHEET_PASSWORD).
+Private Function Deobfuscate(codes As Variant, seed As Long) As String
+    Dim i As Long
+    Dim s As String
+    For i = LBound(codes) To UBound(codes)
+        s = s & Chr$(CLng(codes(i)) Xor ((seed + (i - LBound(codes)) * 7) Mod 251))
+    Next i
+    Deobfuscate = s
+End Function
+
+Public Function SHEET_PASSWORD() As String
+    SHEET_PASSWORD = Deobfuscate(Array(24, 14, 89, 66, 73, 184, 181, 190, 164, 164, 137, 239, 201, 219, 218, 170), 93)
+End Function
+
+Public Function LOGIN_PIN() As String
+    LOGIN_PIN = Deobfuscate(Array(24, 9, 14, 8), 41)
+End Function
+
+' Ripristina lo stato dell'applicazione dopo operazioni lunghe o errori
+Sub RestoreAppState()
+    On Error Resume Next
+    Application.StatusBar = False
+    Application.ScreenUpdating = True
+    Application.EnableEvents = True
+    Application.Calculation = xlCalculationAutomatic
+    Application.DisplayAlerts = True
+    Application.CutCopyMode = False
+End Sub
+
+' Assegna una formula "dinamica" (Formula2) e, se la versione di Excel
+' non la supporta (prima del 365), ripiega su Formula
+Sub Set_Formula_Compat(ByVal rng As Range, ByVal formulaEN As String)
+    On Error Resume Next
+    rng.Formula2 = formulaEN
+    If Err.Number <> 0 Then
+        Err.Clear
+        On Error GoTo 0
+        rng.Formula = formulaEN
+    End If
+    On Error GoTo 0
+End Sub
+
+' Converte una formula italiana usata nelle formattazioni condizionali nell'equivalente
+' inglese: nomi di funzione (E, O, SE, NON), separatore ";" e decimali con ",".
+' Il testo tra virgolette non viene toccato e un nome di funzione viene tradotto solo
+' se non e' parte di un identificatore piu' lungo (riferimento di cella, nome, ecc.).
+Function Formula_To_English(ByVal formulaIT As String) As String
+    Dim res As String
+    Dim ch As String, prev As String, nxt As String
+    Dim tok As String
+    Dim i As Long, j As Long, n As Long
+    Dim inQuote As Boolean
+
+    n = Len(formulaIT)
+    i = 1
+    Do While i <= n
+        ch = Mid$(formulaIT, i, 1)
+        If ch = """" Then
+            inQuote = Not inQuote
+            res = res & ch
+            i = i + 1
+        ElseIf inQuote Then
+            res = res & ch
+            i = i + 1
+        ElseIf ch = ";" Then
+            res = res & ","
+            i = i + 1
+        ElseIf ch = "," Then
+            ' Virgola decimale: tra due cifre
+            If i > 1 And i < n Then
+                prev = Mid$(formulaIT, i - 1, 1)
+                nxt = Mid$(formulaIT, i + 1, 1)
+                If prev Like "#" And nxt Like "#" Then ch = "."
+            End If
+            res = res & ch
+            i = i + 1
+        ElseIf UCase$(ch) Like "[A-Z]" Then
+            ' Legge l'identificatore (lettere, cifre, _ e .)
+            j = i
+            Do While j <= n
+                If Not (UCase$(Mid$(formulaIT, j, 1)) Like "[A-Z0-9_.]") Then Exit Do
+                j = j + 1
+            Loop
+            tok = Mid$(formulaIT, i, j - i)
+            prev = ""
+            If i > 1 Then prev = Mid$(formulaIT, i - 1, 1)
+            If j <= n And prev <> "$" And prev <> "!" And prev <> ":" Then
+                If Mid$(formulaIT, j, 1) = "(" Then
+                    Select Case UCase$(tok)
+                        Case "E": tok = "AND"
+                        Case "O": tok = "OR"
+                        Case "SE": tok = "IF"
+                        Case "NON": tok = "NOT"
+                    End Select
+                End If
+            End If
+            res = res & tok
+            i = j
+        Else
+            res = res & ch
+            i = i + 1
+        End If
+    Loop
+    Formula_To_English = res
+End Function
+
+' Aggiunge una formattazione condizionale basata su formula.
+' Prova prima la sintassi italiana (quella usata finora), poi quella inglese
+' (Excel con impostazioni regionali diverse)
+Function Add_Cond_Format(ByVal rng As Range, ByVal formulaIT As String) As FormatCondition
+    Dim fc As FormatCondition
+    On Error Resume Next
+    Set fc = rng.FormatConditions.Add(Type:=xlExpression, Formula1:=formulaIT)
+    If fc Is Nothing Then
+        Err.Clear
+        On Error GoTo 0
+        Set fc = rng.FormatConditions.Add(Type:=xlExpression, Formula1:=Formula_To_English(formulaIT))
+    End If
+    On Error GoTo 0
+    Set Add_Cond_Format = fc
+End Function
+
 Sub ShowSheets()
     Dim Password As String
     Dim sheet As Worksheet
     Dim currentSheet As Worksheet
 
     Application.ScreenUpdating = False
-    Password = "Ej20082018*Excel"
+    Password = SHEET_PASSWORD
     Set currentSheet = ActiveSheet
 
     For Each sheet In Worksheets
@@ -27,7 +151,7 @@ Sub HideSheets()
     Dim currentSheet As Worksheet
 
     Application.ScreenUpdating = False
-    Password = "Ej20082018*Excel"
+    Password = SHEET_PASSWORD
     Set currentSheet = ActiveSheet
 
     For Each sheet In Worksheets
@@ -68,6 +192,7 @@ End Sub
 
 Sub Delete_names()
     Call ShowSheets
+    On Error GoTo ErrHandler
     Dim Answer As Long
     Answer = MsgBox("Sei sicuro di togliere i nomi?", vbYesNo + vbDefaultButton2)
         
@@ -190,26 +315,33 @@ Sub Delete_names()
                         sheet.Cells(OriginalRow, 1).Interior.color = RGB(217, 217, 217)
                     End If
                     
-                    ' Cancella contenuti se necessario
-                    For Each cell In sheet.Range(sheet.Cells(OriginalRow - 1, columnI), sheet.Cells(OriginalRow - 1, columnF))
-                        If cell.Value <> "" And cell.Value = content Then
-                            cell.ClearContents
-                        End If
-                    Next cell
+                    ' Cancella contenuti se necessario (solo se la riga ha sia "I" che "F")
+                    If columnI > 0 And columnF > 0 Then
+                        For Each cell In sheet.Range(sheet.Cells(OriginalRow - 1, columnI), sheet.Cells(OriginalRow - 1, columnF))
+                            If cell.Value <> "" And cell.Value = content Then
+                                cell.ClearContents
+                            End If
+                        Next cell
+                    End If
                     End If
                 Next name
             End If
         Next sheet
     End If
 Cleanup:
-        
+    On Error Resume Next
     columnF = 0
     columnI = 0
     
     Call HideSheets
 
     ' Riabilita gli eventi
-     Application.EnableEvents = True
+    Application.EnableEvents = True
+    Exit Sub
+
+ErrHandler:
+    MsgBox "Errore: " & Err.Description & " (Codice " & Err.Number & ")", vbCritical
+    Resume Cleanup
 End Sub
 
 Sub Show_Lines()
@@ -273,6 +405,9 @@ Exit Sub
 
 ErrorHandler:
     MsgBox "Errore: " & Err.Description & " (Codice " & Err.Number & ") nel foglio " & sheet.name, vbCritical
+    On Error Resume Next
+    Call HideSheets
+    Call RestoreAppState
     Exit Sub
 End Sub
 
@@ -289,6 +424,7 @@ Sub Hide_Lines()
     Dim clear_down_down As Boolean
     
     Call ShowSheets
+    Application.ScreenUpdating = False
     
     On Error GoTo ErrorHandler ' Gestione degli errori
     
@@ -365,7 +501,7 @@ Sub Hide_Lines()
                         
                         If cell_y.Row < sheet.Rows.Count - 1 And clear_down Then ' Evita di andare oltre l'ultima riga
                             For Each cell_x In line
-                                If sheet.Cells(cell_x.Row + 1, cell_x.Column).Value <> "" Then
+                                If sheet.Cells(cell_x.Row + 2, cell_x.Column).Value <> "" Then
                                     clear_down_down = False
                                     Exit For
                                 End If
@@ -456,7 +592,7 @@ Sub Hide_Lines()
                         
                         If cell_y.Row < sheet.Rows.Count - 1 And clear_down Then ' Evita di andare oltre l'ultima riga
                             For Each cell_x In line
-                                If sheet.Cells(cell_x.Row + 1, cell_x.Column).Value <> "" Then
+                                If sheet.Cells(cell_x.Row + 2, cell_x.Column).Value <> "" Then
                                     clear_down_down = False
                                     Exit For
                                 End If
@@ -493,5 +629,55 @@ Exit Sub
 
 ErrorHandler:
     MsgBox "Errore: " & Err.Description & " (Codice " & Err.Number & ") nel foglio " & sheet.name, vbCritical
+    On Error Resume Next
+    Call HideSheets
+    Call RestoreAppState
     Exit Sub
 End Sub
+
+' Restituisce "FERIE", "MALATTIA" o "CORSO" se il dipendente e' assente nel giorno
+' del foglio indicato (LUN..DOM), altrimenti "". Legge le etichette scritte in TOT
+' da Check_Days (colonna 4 + 2 * indice giorno, riga del nome in colonna B).
+Public Function Lineare_Assenza(ByVal ws As Worksheet, ByVal WorkerName As String) As String
+    Dim dayIndex As Integer
+
+    Select Case ws.name
+        Case "LUN": dayIndex = 0
+        Case "MAR": dayIndex = 1
+        Case "MER": dayIndex = 2
+        Case "GIO": dayIndex = 3
+        Case "VEN": dayIndex = 4
+        Case "SAB": dayIndex = 5
+        Case "DOM": dayIndex = 6
+        Case Else: Exit Function
+    End Select
+
+    Lineare_Assenza = Lineare_Assenza_Giorno("TOT", dayIndex, WorkerName)
+End Function
+
+' Come Lineare_Assenza, ma per un foglio riepilogo (TOT o TOT-M) e un giorno
+' indicato per indice (0 = LUN .. 6 = DOM). Usata anche dal foglio MANAGER.
+Public Function Lineare_Assenza_Giorno(ByVal TotSheetName As String, ByVal dayIndex As Integer, ByVal WorkerName As String) As String
+    Dim wsTOT As Worksheet
+    Dim r As Long, c As Long, LastRow As Long
+    Dim v As String
+
+    Lineare_Assenza_Giorno = ""
+
+    WorkerName = Trim(WorkerName)
+    If WorkerName = "" Then Exit Function
+    If dayIndex < 0 Or dayIndex > 6 Then Exit Function
+
+    On Error GoTo Fine
+    Set wsTOT = ThisWorkbook.Worksheets(TotSheetName)
+    c = 4 + 2 * dayIndex
+    LastRow = wsTOT.Cells(wsTOT.Rows.Count, 2).End(xlUp).Row
+    For r = 2 To LastRow
+        If StrComp(Trim(CStr(wsTOT.Cells(r, 2).Value)), WorkerName, vbTextCompare) = 0 Then
+            v = UCase(Trim(CStr(wsTOT.Cells(r, c).Value)))
+            If v = "FERIE" Or v = "MALATTIA" Or v = "CORSO" Then Lineare_Assenza_Giorno = v
+            Exit Function
+        End If
+    Next r
+Fine:
+End Function
