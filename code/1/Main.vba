@@ -3,7 +3,7 @@ Option Explicit
 Private Sub Worksheet_Activate()
     Dim Password As String
 
-    Password = "Ej20082018*Excel"
+    Password = SHEET_PASSWORD
     Me.Protect Password:=Password
 End Sub
 
@@ -11,7 +11,7 @@ Private Sub Worksheet_SelectionChange(ByVal Target As Range)
     Dim rngDati As Range
     Dim Password As String
 
-    Password = "Ej20082018*Excel"
+    Password = SHEET_PASSWORD
 
     Set rngDati = Range("C21:J26")
 

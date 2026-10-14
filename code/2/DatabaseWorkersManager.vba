@@ -9,6 +9,7 @@ Private Sub Worksheet_Change(ByVal Target As Range)
     If Application.Ready = False Then Exit Sub
     If Application.CommandBars("Cell").Enabled = False Then Exit Sub
     
+    On Error GoTo Cleanup
     Application.EnableEvents = False
     Application.ScreenUpdating = False
     
@@ -18,9 +19,13 @@ Private Sub Worksheet_Change(ByVal Target As Range)
     Wend
     LastRow = LastRow - 1
     
+    ' Nessun lavoratore: niente da aggiornare o ordinare
+    If LastRow < 3 Then GoTo Cleanup
+    
     Set rngMalattieCorsi = Range(Cells(3, 5), Cells(LastRow, 7))
     
-    If Not Intersect(Target, rngMalattieCorsi) Is Nothing Then
+    ' Con selezioni multiple (incolla) Target.Value e' un array: salta la propagazione Si/No
+    If Target.Cells.Count = 1 And Not Intersect(Target, rngMalattieCorsi) Is Nothing Then
         If Target.Column = 5 Then
             If Target.Value = "No" Then
                 Column = 9
@@ -109,9 +114,14 @@ Private Sub Worksheet_Change(ByVal Target As Range)
 
     ' Nasconde le colonne helper
     Columns(helperCol1 & ":" & helperCol2).EntireColumn.Hidden = True
-    
+
+Cleanup:
+    ' Ripristina sempre lo stato dell'applicazione, anche in caso di errore
     Application.EnableEvents = True
     Application.ScreenUpdating = True
+    If Err.Number <> 0 Then
+        MsgBox "Errore: " & Err.Description, vbCritical + vbOKOnly
+    End If
 End Sub
 
 Private Sub Worksheet_SelectionChange(ByVal Target As Range)
@@ -121,7 +131,7 @@ Private Sub Worksheet_SelectionChange(ByVal Target As Range)
     Dim rngCorsi As Range
     Dim rngFerie As Range
     Dim LastRow As Integer
-    Password = "Ej20082018*Excel"
+    Password = SHEET_PASSWORD
     
     LastRow = 3
     While Cells(LastRow, 1).Value <> ""

@@ -1,4 +1,30 @@
 Option Explicit
+
+' Restituisce la riga del marcatore "IMPRESA1" (colonna B) nel foglio TOT.
+' Se il marcatore manca solleva un errore invece di scorrere il foglio all'infinito.
+Function Find_End_Row(ByVal ws As Worksheet) As Long
+    Dim r As Long, Last As Long
+    Last = ws.Cells(ws.Rows.Count, 2).End(xlUp).Row
+    For r = 4 To Last
+        If ws.Cells(r, 2).Value = "IMPRESA1" Then
+            Find_End_Row = r
+            Exit Function
+        End If
+    Next r
+    Err.Raise vbObjectError + 513, "Find_End_Row", "Riga 'IMPRESA1' non trovata nel foglio " & ws.name
+End Function
+
+' Colore di sfondo associato al ruolo (1=Gel, 2=Front, 3=Tutto, 4=Cucina).
+' I ruoli non riconosciuti (es. "N/A") usano il colore di Front.
+Function Role_Color(ByVal Role As Integer) As Long
+    Select Case Role
+        Case 1: Role_Color = RGB(255, 242, 204)
+        Case 3: Role_Color = RGB(221, 235, 247)
+        Case 4: Role_Color = RGB(252, 228, 214)
+        Case Else: Role_Color = RGB(255, 255, 255)
+    End Select
+End Function
+
 ' Aggiunge un lavoratore alle tabelle TOT e FORMAZIONE
 Sub Add_Worker(ByVal WorkerName As String, ByVal WorkerName_Surname As String, ByVal Contract As Integer, ByVal WorkerPos As Integer)
     Dim wsTOT As Worksheet, wsFORM As Worksheet
@@ -7,10 +33,7 @@ Sub Add_Worker(ByVal WorkerName As String, ByVal WorkerName_Surname As String, B
     Set wsTOT = Worksheets("TOT")
     Set wsFORM = Worksheets("FORMAZIONE")
 
-    LastRow = 4
-    While wsTOT.Cells(LastRow, 2).Value <> "IMPRESA1"
-        LastRow = LastRow + 1
-    Wend
+    LastRow = Find_End_Row(wsTOT)
 
     If WorkerPos < 0 Or WorkerPos + 3 > Rows.Count Then
         MsgBox "Errore: posizione lavoratore non valida (" & WorkerPos & ")", vbCritical
@@ -75,10 +98,7 @@ Sub Delete_Worker(ByVal WorkerPos As Integer)
     wsFORM.Rows(WorkerPos + 3).Delete
     DoEvents
 
-    LastRow = 4
-    While wsTOT.Cells(LastRow, 2).Value <> "IMPRESA1" And LastRow < Rows.Count
-        LastRow = LastRow + 1
-    Wend
+    LastRow = Find_End_Row(wsTOT)
 
     For i = WorkerPos To LastRow - 4
         wsTOT.Cells(i + 3, 1).Value = i
@@ -90,17 +110,16 @@ Sub Delete_Worker(ByVal WorkerPos As Integer)
 End Sub
 
 ' Trova un nome nella colonna 2 del foglio TOT a partire da una riga specifica
-Function NameFound(ByVal WorkerName As String, ByVal Start As String) As Integer
-    Dim wsTOT As Worksheet, WorkerRow As Integer
+Function NameFound(ByVal WorkerName As String, ByVal Start As Long) As Integer
+    Dim wsTOT As Worksheet, WorkerRow As Long, EndRow As Long
     Set wsTOT = Worksheets("TOT")
-    WorkerRow = Start + 1
-    While wsTOT.Cells(WorkerRow, 2).Value <> "IMPRESA1"
+    EndRow = Find_End_Row(wsTOT)
+    For WorkerRow = Start + 1 To EndRow - 1
         If wsTOT.Cells(WorkerRow, 2).Value = WorkerName Then
             NameFound = WorkerRow
             Exit Function
         End If
-        WorkerRow = WorkerRow + 1
-    Wend
+    Next WorkerRow
     NameFound = -1
 End Function
 
@@ -138,12 +157,7 @@ Function Paint_Worker(ByVal Pos As Integer, ByVal Role As Integer)
     Set wsFORM = Worksheets("FORMAZIONE")
 
     Dim color As Long
-    Select Case Role
-        Case 1: color = RGB(255, 242, 204)
-        Case 2: color = RGB(255, 255, 255)
-        Case 3: color = RGB(221, 235, 247)
-        Case 4: color = RGB(252, 228, 214)
-    End Select
+    color = Role_Color(Role)
 
     With wsTOT
         .Range(.Cells(Pos, 2), .Cells(Pos, 27)).Interior.color = color
@@ -286,12 +300,7 @@ Function Update_Validation()
     Set wsTOT = ThisWorkbook.Sheets("TOT")
     
     ' Trova l'ultima riga non vuota della colonna A nel foglio TOT
-    LastRow = 1
-
-    While wsTOT.Cells(LastRow, 2).Value <> "IMPRESA1" And LastRow < Rows.Count
-        LastRow = LastRow + 1
-    Wend
-    LastRow = LastRow + 3
+    LastRow = Find_End_Row(wsTOT) + 3
     
     ' Costruisci l'indirizzo dell'intervallo da usare nella validazione
     addressList = "=TOT!$B$4:$B$" & LastRow
@@ -358,7 +367,7 @@ Sub UpdateFormatConditions()
                  ")"
         
         ' Applica la regola
-        Set fc = rngTemp.FormatConditions.Add(Type:=xlExpression, Formula1:=formula)
+        Set fc = Add_Cond_Format(rngTemp, formula)
         fc.Interior.color = RGB(255, 0, 0) ' Rosso
         fc.Font.Bold = True
         fc.Font.color = RGB(255, 255, 255) ' Bianco
@@ -378,7 +387,7 @@ Sub UpdateFormatConditions()
                   "O(E($" & col1 & "4>$" & col2 & "4;$" & col4 & "4-$" & col2 & "4<0,46);" & _
                   "E($" & col1 & "4<$" & col2 & "4;(1-$" & col2 & "4)+$" & col4 & "4<0,46)))"
         ' Applica la regola
-        Set fc = rngTemp.FormatConditions.Add(Type:=xlExpression, Formula1:=formula)
+        Set fc = Add_Cond_Format(rngTemp, formula)
         fc.Interior.color = RGB(255, 0, 0) ' Rosso
         fc.Font.Bold = True
         fc.Font.color = RGB(255, 255, 255) ' Bianco
@@ -401,13 +410,13 @@ Sub FixErrorsDays()
             For Each cell In ws.Range("B16:B165")
                 If cell.Interior.color = RGB(217, 217, 217) Then
                     ' Formula for total hours (column B)
-                    cell.Formula2 = "=IFERROR(D" & cell.Row & "-C" & cell.Row & "+IF(C" & cell.Row & ">=D" & cell.Row & ",1),0)*24"
+                    Call Set_Formula_Compat(cell, "=IFERROR(D" & cell.Row & "-C" & cell.Row & "+IF(C" & cell.Row & ">=D" & cell.Row & ",1),0)*24")
                     
                     ' Formula for "I" time (column C)
-                    cell.Offset(0, 1).Formula2 = "=IFERROR(TIMEVALUE(INDEX($F$1:$BR$1,MATCH(""I"",$F" & cell.Row & ":$BR" & cell.Row & ",0))),""OFF"")"
+                    Call Set_Formula_Compat(cell.Offset(0, 1), "=IFERROR(TIMEVALUE(INDEX($F$1:$BR$1,MATCH(""I"",$F" & cell.Row & ":$BR" & cell.Row & ",0))),""OFF"")")
                     
                     ' Formula for "F" time (column D)
-                    cell.Offset(0, 2).Formula2 = "=IFERROR(TIMEVALUE(INDEX($F$1:$BR$1,MATCH(""F"",$F" & cell.Row & ":$BR" & cell.Row & ",0))),""OFF"")"
+                    Call Set_Formula_Compat(cell.Offset(0, 2), "=IFERROR(TIMEVALUE(INDEX($F$1:$BR$1,MATCH(""F"",$F" & cell.Row & ":$BR" & cell.Row & ",0))),""OFF"")")
                 End If
             Next cell
         End If
@@ -421,6 +430,7 @@ Sub Update_Workers()
     Update.Show vbModeless
     DoEvents ' Permette il disegno della form prima di proseguire
 
+    On Error GoTo ErrHandler
     Application.ScreenUpdating = False
     Application.EnableEvents = False
     Application.Calculation = xlCalculationManual
@@ -445,15 +455,11 @@ Sub Update_Workers()
             Case "Front": WorkerRole = 2
             Case "Tutto": WorkerRole = 3
             Case "Cucina": WorkerRole = 4
+            Case Else: WorkerRole = 2 ' "N/A" o ruolo sconosciuto: trattato come Front
         End Select
 
         Dim color As Long
-        Select Case WorkerRole
-            Case 1: color = RGB(255, 242, 204)
-            Case 2: color = RGB(255, 255, 255)
-            Case 3: color = RGB(221, 235, 247)
-            Case 4: color = RGB(252, 228, 214)
-        End Select
+        color = Role_Color(WorkerRole)
 
         If NameFound(WorkerName, 3) <> -1 Then
             WorkerPos = NameFound(WorkerName, 3) - 3
@@ -478,10 +484,7 @@ Sub Update_Workers()
         Worker = Worker + 1
     Wend
 
-    LastRow = 4
-    While wsTOT.Cells(LastRow, 2).Value <> "IMPRESA1" And LastRow < Rows.Count
-        LastRow = LastRow + 1
-    Wend
+    LastRow = Find_End_Row(wsTOT)
 
     While Worker - 2 <> LastRow - 3
         Call Delete_Worker(Worker - 2)
@@ -505,6 +508,16 @@ Sub Update_Workers()
 
     ' Mostra un messaggio di completamento
     MsgBox "Aggiornamento completato", vbInformation, "Aggiornamento lavoratori"
+    Exit Sub
+
+ErrHandler:
+    Dim ErrMsg As String
+    ErrMsg = Err.Description & " (Codice " & Err.Number & ")"
+    On Error Resume Next
+    Call RestoreAppState
+    Call HideSheets
+    Update.Hide
+    MsgBox "Aggiornamento interrotto alla riga " & Worker & " di Dipendenti:" & vbCrLf & ErrMsg, vbCritical, "Aggiornamento lavoratori"
 End Sub
 
 Sub PrintRange()

@@ -7,7 +7,7 @@ Private Sub Worksheet_SelectionChange(ByVal Target As Range)
     Dim rngCorsi As Range
     Dim LastRow As Integer
     Dim Row As Integer
-    Password = "Ej20082018*Excel"
+    Password = SHEET_PASSWORD
     
     LastRow = 4
     While Cells(LastRow, 1) <> ""
