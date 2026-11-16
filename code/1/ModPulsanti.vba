@@ -715,15 +715,15 @@ Sub Pulisci_Incolla_Vendite(ByVal ws As Worksheet, ByVal Target As Range)
     Set rngDati = ws.UsedRange
     UltimaRiga = rngDati.Row + rngDati.Rows.Count - 1
     UltimaCol = rngDati.Column + rngDati.Columns.Count - 1
+    '    (Niente test su rngDati.MergeCells: con celle unite e non vale Null
+    '    e un If su Null salta il blocco.)
     Set Unite = New Collection
-    If rngDati.MergeCells <> False Then
-        For Each Cella In rngDati.Cells
-            If Cella.MergeCells Then
-                If Cella.Address = Cella.MergeArea.Cells(1, 1).Address Then Unite.Add Cella.MergeArea.Address
-            End If
-        Next Cella
-        rngDati.UnMerge
-    End If
+    For Each Cella In rngDati.Cells
+        If Cella.MergeCells Then
+            If Cella.Address = Cella.MergeArea.Cells(1, 1).Address Then Unite.Add Cella.MergeArea.Address
+        End If
+    Next Cella
+    rngDati.UnMerge
     If UltimaRiga >= 2 Then
         ws.Range(ws.Cells(2, 1), ws.Cells(UltimaRiga, UltimaCol)).Copy ws.Cells(1, 1)
         Application.CutCopyMode = False
