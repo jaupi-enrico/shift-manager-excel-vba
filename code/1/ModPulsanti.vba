@@ -694,6 +694,8 @@ Sub Pulisci_Incolla_Vendite(ByVal ws As Worksheet, ByVal Target As Range)
     Dim Testo As String, Pulito As String
     Dim Cella As Range
     Dim UltimaRiga As Long, UltimaCol As Long
+    Dim Unite As Collection
+    Dim v As Variant
 
     If Target.Row <> 1 Or Target.Column <> 1 Then Exit Sub
     If Target.Rows.Count < 2 Or Target.Columns.Count < 2 Then Exit Sub
@@ -708,13 +710,29 @@ Sub Pulisci_Incolla_Vendite(ByVal ws As Worksheet, ByVal Target As Range)
     ' 1. Toglie una riga all'inizio. Niente Rows(1).Delete (ne' Cut): eliminare
     '    la riga sposterebbe i riferimenti delle formule degli altri fogli.
     '    Si copia il contenuto una riga piu' in alto e si svuota l'ultima riga.
+    '    Le celle unite bloccherebbero la copia (aree sovrapposte): si annullano
+    '    prima e si ricreano una riga piu' in alto.
     Set rngDati = ws.UsedRange
     UltimaRiga = rngDati.Row + rngDati.Rows.Count - 1
     UltimaCol = rngDati.Column + rngDati.Columns.Count - 1
+    Set Unite = New Collection
+    If rngDati.MergeCells <> False Then
+        For Each Cella In rngDati.Cells
+            If Cella.MergeCells Then
+                If Cella.Address = Cella.MergeArea.Cells(1, 1).Address Then Unite.Add Cella.MergeArea.Address
+            End If
+        Next Cella
+        rngDati.UnMerge
+    End If
     If UltimaRiga >= 2 Then
         ws.Range(ws.Cells(2, 1), ws.Cells(UltimaRiga, UltimaCol)).Copy ws.Cells(1, 1)
         Application.CutCopyMode = False
         ws.Range(ws.Cells(UltimaRiga, 1), ws.Cells(UltimaRiga, UltimaCol)).Clear
+        Application.DisplayAlerts = False
+        For Each v In Unite
+            If ws.Range(CStr(v)).Row >= 2 Then ws.Range(CStr(v)).Offset(-1, 0).Merge
+        Next v
+        Application.DisplayAlerts = True
     Else
         ws.Rows(1).Clear
     End If
@@ -752,6 +770,7 @@ Sub Pulisci_Incolla_Vendite(ByVal ws As Worksheet, ByVal Target As Range)
                             Err.Clear
                             Cella.Value = "'" & Pulito
                         End If
+                        Err.Clear
                         On Error GoTo Fine
                     End If
                 End If
