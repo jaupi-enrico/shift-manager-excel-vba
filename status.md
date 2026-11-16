@@ -1,4 +1,13 @@
-# Status: branch `merge/no-ui-alerts`
+# Status
+
+## 2026-11-16: sales sheets Lunedì…Domenica (branch `feat/fogli-vendite`, merged to main)
+Tested by the user in Excel: pasting a full page works and `Fasce_Tot` reads the right rows. `code/1` == `code/2`.
+- `code/<n>/FascieLUN.vba` … `FascieDOM.vba`: code-behind of the sales sheets. Each has only `Worksheet_Change` calling `Pulisci_Incolla_Vendite(Me, Target)`. Files keep the workbook CodeNames, so the updater matches them (no module renaming).
+- `ModPulsanti.vba`: `Pulisci_Incolla_Vendite`. On a paste starting at A1 (≥2×2, not empty) it moves the page up one row by copying rows 2..last to row 1 and clearing the last row. It does not use `Rows(1).Delete`, which moved the references in `Fasce_Tot`. Merged cells are recorded, unmerged, and re-merged one row up. `UsedRange.MergeCells` is Null on mixed sheets, so the code never branches on it. It then strips leading space/`Chr(160)`/tab via `FormulaLocal`, falling back to `'text`.
+- `gestionale.xlsm` in the repo was not touched.
+
+---
+Previous status (branch `merge/no-ui-alerts`, already merged to main):
 
 Last updated: 2026-10-14. All planned code work is done and merged into this branch. Nothing has been run in Excel yet. No PR exists and none must be opened until the owner says so.
 

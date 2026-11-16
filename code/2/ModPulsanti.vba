@@ -681,3 +681,106 @@ Public Function Lineare_Assenza_Giorno(ByVal TotSheetName As String, ByVal dayIn
     Next r
 Fine:
 End Function
+
+' Fogli vendite (Lunedì ... Domenica, moduli Lunedi ... Domenica).
+' Quando sopra il foglio viene incollata un'intera pagina (incolla che parte
+' da A1 e copre piu' righe e colonne):
+'   1. elimina la prima riga
+'   2. toglie gli spazi all'inizio di ogni dato (spazi, spazi non separabili, tab)
+Sub Pulisci_Incolla_Vendite(ByVal ws As Worksheet, ByVal Target As Range)
+    Dim rngDati As Range
+    Dim Valori As Variant
+    Dim r As Long, c As Long
+    Dim Testo As String, Pulito As String
+    Dim Cella As Range
+    Dim UltimaRiga As Long, UltimaCol As Long
+    Dim Unite As Collection
+    Dim v As Variant
+
+    If Target.Row <> 1 Or Target.Column <> 1 Then Exit Sub
+    If Target.Rows.Count < 2 Or Target.Columns.Count < 2 Then Exit Sub
+    ' Ignora la cancellazione del foglio (Canc su tutto il foglio)
+    If Application.WorksheetFunction.CountA(Target) = 0 Then Exit Sub
+
+    On Error GoTo Fine
+    Application.EnableEvents = False
+    Application.ScreenUpdating = False
+    ws.Unprotect Password:=SHEET_PASSWORD
+
+    ' 1. Toglie una riga all'inizio. Niente Rows(1).Delete (ne' Cut): eliminare
+    '    la riga sposterebbe i riferimenti delle formule degli altri fogli.
+    '    Si copia il contenuto una riga piu' in alto e si svuota l'ultima riga.
+    '    Le celle unite bloccherebbero la copia (aree sovrapposte): si annullano
+    '    prima e si ricreano una riga piu' in alto.
+    Set rngDati = ws.UsedRange
+    UltimaRiga = rngDati.Row + rngDati.Rows.Count - 1
+    UltimaCol = rngDati.Column + rngDati.Columns.Count - 1
+    '    (Niente test su rngDati.MergeCells: con celle unite e non vale Null
+    '    e un If su Null salta il blocco.)
+    Set Unite = New Collection
+    For Each Cella In rngDati.Cells
+        If Cella.MergeCells Then
+            If Cella.Address = Cella.MergeArea.Cells(1, 1).Address Then Unite.Add Cella.MergeArea.Address
+        End If
+    Next Cella
+    rngDati.UnMerge
+    If UltimaRiga >= 2 Then
+        ws.Range(ws.Cells(2, 1), ws.Cells(UltimaRiga, UltimaCol)).Copy ws.Cells(1, 1)
+        Application.CutCopyMode = False
+        ws.Range(ws.Cells(UltimaRiga, 1), ws.Cells(UltimaRiga, UltimaCol)).Clear
+        Application.DisplayAlerts = False
+        For Each v In Unite
+            If ws.Range(CStr(v)).Row >= 2 Then ws.Range(CStr(v)).Offset(-1, 0).Merge
+        Next v
+        Application.DisplayAlerts = True
+    Else
+        ws.Rows(1).Clear
+    End If
+
+    ' 2. Toglie gli spazi iniziali da ogni dato
+    Set rngDati = ws.UsedRange
+    If rngDati.Cells.CountLarge = 1 Then
+        ReDim Valori(1 To 1, 1 To 1)
+        Valori(1, 1) = rngDati.Value2
+    Else
+        Valori = rngDati.Value2
+    End If
+
+    For r = 1 To UBound(Valori, 1)
+        For c = 1 To UBound(Valori, 2)
+            If VarType(Valori(r, c)) = vbString Then
+                Testo = Valori(r, c)
+                Pulito = Testo
+                Do While Len(Pulito) > 0
+                    Select Case Left$(Pulito, 1)
+                        Case " ", Chr$(160), vbTab
+                            Pulito = Mid$(Pulito, 2)
+                        Case Else
+                            Exit Do
+                    End Select
+                Loop
+                If Pulito <> Testo Then
+                    Set Cella = rngDati.Cells(r, c)
+                    If Not Cella.HasFormula Then
+                        ' FormulaLocal: "1.234,56" diventa un numero come se
+                        ' fosse digitato; se non e' interpretabile resta testo
+                        On Error Resume Next
+                        Cella.FormulaLocal = Pulito
+                        If Err.Number <> 0 Then
+                            Err.Clear
+                            Cella.Value = "'" & Pulito
+                        End If
+                        Err.Clear
+                        On Error GoTo Fine
+                    End If
+                End If
+            End If
+        Next c
+    Next r
+
+Fine:
+    If Err.Number <> 0 Then
+        MsgBox "Errore durante la pulizia dei dati incollati: " & Err.Description, vbExclamation
+    End If
+    Call RestoreAppState
+End Sub
