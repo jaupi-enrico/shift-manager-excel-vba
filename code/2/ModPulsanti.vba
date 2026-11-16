@@ -693,6 +693,7 @@ Sub Pulisci_Incolla_Vendite(ByVal ws As Worksheet, ByVal Target As Range)
     Dim r As Long, c As Long
     Dim Testo As String, Pulito As String
     Dim Cella As Range
+    Dim UltimaRiga As Long, UltimaCol As Long
 
     If Target.Row <> 1 Or Target.Column <> 1 Then Exit Sub
     If Target.Rows.Count < 2 Or Target.Columns.Count < 2 Then Exit Sub
@@ -704,8 +705,19 @@ Sub Pulisci_Incolla_Vendite(ByVal ws As Worksheet, ByVal Target As Range)
     Application.ScreenUpdating = False
     ws.Unprotect Password:=SHEET_PASSWORD
 
-    ' 1. Toglie una riga all'inizio
-    ws.Rows(1).Delete
+    ' 1. Toglie una riga all'inizio. Niente Rows(1).Delete (ne' Cut): eliminare
+    '    la riga sposterebbe i riferimenti delle formule degli altri fogli.
+    '    Si copia il contenuto una riga piu' in alto e si svuota l'ultima riga.
+    Set rngDati = ws.UsedRange
+    UltimaRiga = rngDati.Row + rngDati.Rows.Count - 1
+    UltimaCol = rngDati.Column + rngDati.Columns.Count - 1
+    If UltimaRiga >= 2 Then
+        ws.Range(ws.Cells(2, 1), ws.Cells(UltimaRiga, UltimaCol)).Copy ws.Cells(1, 1)
+        Application.CutCopyMode = False
+        ws.Range(ws.Cells(UltimaRiga, 1), ws.Cells(UltimaRiga, UltimaCol)).Clear
+    Else
+        ws.Rows(1).Clear
+    End If
 
     ' 2. Toglie gli spazi iniziali da ogni dato
     Set rngDati = ws.UsedRange
