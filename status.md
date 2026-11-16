@@ -1,17 +1,10 @@
 # Status
 
-## Handoff 2026-11-16 (read first): sales sheets Lunedì…Domenica, branch `feat/fogli-vendite`
-The branch was created from `origin/main` (`ff62dd1`). The work from `fix/review-findings` was moved here, with conflicts in `ModPulsanti` / `status.md` resolved by keeping both sides. **Staged, not committed, not run in Excel.** `code/1` == `code/2`.
-- `code/<n>/FascieLUN.vba`, `FascieMAR`, `FascieMER`, `FascieGIO`, `FascieVEN`, `FascieSAB`, `FascieDOM`: code-behind of the sales sheets (tabs 17–23). Each has only `Worksheet_Change` calling `Pulisci_Incolla_Vendite(Me, Target)`.
-- `ModPulsanti.vba`: `Pulisci_Incolla_Vendite`. It runs on a paste starting at A1 that is ≥2×2 and not empty. It deletes row 1, then strips leading space/`Chr(160)`/tab from every string in `UsedRange`. It writes back via `FormulaLocal` (Italian numbers), falling back to `'text`.
-- **Names:** files keep the workbook CodeNames (`FascieXXX`), since the updater matches files to CodeNames. No module renaming in `Updater.vba`; one open is enough.
-- `gestionale.xlsm` shows as **deleted** in the working tree. This was not done by Claude: there is an untracked `gestionale.xls` dated 14 Oct. Ask the user and do not stage it. The repo's `.xlsm` should also get its CodeNames renamed by hand (VBE → Properties → (Name)) or by running the updater.
-
-**Untested risks:** renaming a document module's CodeName while the project is running (check that there is no "project reset" or lost state), and `FormulaLocal` on cells inside merged areas.
-
-**Next:**
-1. The user tests on a copy: point `UPDATE_BRANCH` at `feat/fogli-vendite` (revert before merging), open once, check the `FascieXXX` modules contain the code, then paste a full page.
-2. Commit / PR only when the user asks.
+## 2026-11-16: sales sheets Lunedì…Domenica (branch `feat/fogli-vendite`, merged to main)
+Tested by the user in Excel: pasting a full page works and `Fasce_Tot` reads the right rows. `code/1` == `code/2`.
+- `code/<n>/FascieLUN.vba` … `FascieDOM.vba`: code-behind of the sales sheets. Each has only `Worksheet_Change` calling `Pulisci_Incolla_Vendite(Me, Target)`. Files keep the workbook CodeNames, so the updater matches them (no module renaming).
+- `ModPulsanti.vba`: `Pulisci_Incolla_Vendite`. On a paste starting at A1 (≥2×2, not empty) it moves the page up one row by copying rows 2..last to row 1 and clearing the last row. It does not use `Rows(1).Delete`, which moved the references in `Fasce_Tot`. Merged cells are recorded, unmerged, and re-merged one row up. `UsedRange.MergeCells` is Null on mixed sheets, so the code never branches on it. It then strips leading space/`Chr(160)`/tab via `FormulaLocal`, falling back to `'text`.
+- `gestionale.xlsm` in the repo was not touched.
 
 ---
 Previous status (branch `merge/no-ui-alerts`, already merged to main):
