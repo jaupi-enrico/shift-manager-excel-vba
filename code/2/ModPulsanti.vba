@@ -686,7 +686,8 @@ End Function
 ' Quando sopra il foglio viene incollata un'intera pagina (incolla che parte
 ' da A1 e copre piu' righe e colonne):
 '   1. elimina la prima riga
-'   2. toglie gli spazi all'inizio di ogni dato (spazi, spazi non separabili, tab)
+'   2. toglie gli spazi all'inizio e alla fine di ogni dato (spazi, spazi non separabili, tab)
+'   3. i numeri salvati come testo diventano numeri
 Sub Pulisci_Incolla_Vendite(ByVal ws As Worksheet, ByVal Target As Range)
     Dim rngDati As Range
     Dim Valori As Variant
@@ -737,7 +738,8 @@ Sub Pulisci_Incolla_Vendite(ByVal ws As Worksheet, ByVal Target As Range)
         ws.Rows(1).Clear
     End If
 
-    ' 2. Toglie gli spazi iniziali da ogni dato
+    ' 2-3. Toglie gli spazi all'inizio e alla fine e trasforma in numero
+    '      ogni testo che e' un numero ("47", "1.234,56")
     Set rngDati = ws.UsedRange
     If rngDati.Cells.CountLarge = 1 Then
         ReDim Valori(1 To 1, 1 To 1)
@@ -759,9 +761,19 @@ Sub Pulisci_Incolla_Vendite(ByVal ws As Worksheet, ByVal Target As Range)
                             Exit Do
                     End Select
                 Loop
-                If Pulito <> Testo Then
+                Do While Len(Pulito) > 0
+                    Select Case Right$(Pulito, 1)
+                        Case " ", Chr$(160), vbTab
+                            Pulito = Left$(Pulito, Len(Pulito) - 1)
+                        Case Else
+                            Exit Do
+                    End Select
+                Loop
+                If Pulito <> Testo Or IsNumeric(Pulito) Then
                     Set Cella = rngDati.Cells(r, c)
                     If Not Cella.HasFormula Then
+                        ' Celle in formato Testo: il numero resterebbe testo
+                        If IsNumeric(Pulito) And Cella.NumberFormat = "@" Then Cella.NumberFormat = "General"
                         ' FormulaLocal: "1.234,56" diventa un numero come se
                         ' fosse digitato; se non e' interpretabile resta testo
                         On Error Resume Next
