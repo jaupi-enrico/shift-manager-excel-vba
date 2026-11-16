@@ -27,6 +27,7 @@ Module naming maps onto workbook sheets and shared logic:
 - **`Formazione` / `FormazioneManager`**: training-day tracking, with absences (days off, sick days, formation days) highlighted visually.
 - **`GeneralWorkbook`**: the `ThisWorkbook` module. `Workbook_BeforeClose` asks to save, then protects every sheet and activates the day/`MANAGER` sheets.
 - **`Main`**: a sheet code-behind that auto-protects the sheet on activation and unprotects only the input range (`C21:J26`, `B2`) when selected.
+- **`Lunedi` … `Domenica`** (no accents): code-behind of the sales sheets `Lunedì` … `Domenica`. Their CodeNames used to be `FascieLUN` … `FascieDOM`; `Rinomina_Moduli_Vendite` in `Updater.vba` renames old workbooks before downloading, so a deployed workbook needs two opens (first gets the new updater, second renames and downloads). On a whole-page paste starting at A1 they call `Pulisci_Incolla_Vendite` (in `ModPulsanti`), which deletes row 1 and strips leading spaces from every value.
 - **`ModPulsanti`**: handlers for the dashboard buttons. **`StampaFogli`**: printing. **`LoginForm`**, `Update` (UserForm shown during update): forms.
 
 Shared pattern in the `Linear*` modules: module-level `Dim` globals hold the working state (`rngName`, `ColumnName`, `OriginalRow`, `columnI/columnF`, …) and helper functions like `Find_Name_Column` place a worker's name in a free column of the shift grid, searching forward then backward and treating empty/pause cells as unavailable. Each file uses `Option Explicit`.

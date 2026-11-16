@@ -1,4 +1,21 @@
-# Status: branch `merge/no-ui-alerts`
+# Status
+
+## Handoff 2026-11-16 (read first): sales sheets Lunedì…Domenica, branch `feat/fogli-vendite`
+The branch was created from `origin/main` (`ff62dd1`). The work from `fix/review-findings` was moved here, with conflicts in `ModPulsanti` / `status.md` resolved by keeping both sides. **Staged, not committed, not run in Excel.** `code/1` == `code/2`.
+- `code/<n>/Lunedi.vba`, `Martedi`, `Mercoledi`, `Giovedi`, `Venerdi`, `Sabato`, `Domenica`: code-behind of the sales sheets (tabs 17–23). Each has only `Worksheet_Change` calling `Pulisci_Incolla_Vendite(Me, Target)`.
+- `ModPulsanti.vba`: `Pulisci_Incolla_Vendite`. It runs on a paste starting at A1 that is ≥2×2 and not empty. It deletes row 1, then strips leading space/`Chr(160)`/tab from every string in `UsedRange`. It writes back via `FormulaLocal` (Italian numbers), falling back to `'text`.
+- **Names:** the user wants the module names to match the sheet names. The updater matches files to **CodeNames**, and in the workbook those are still `FascieLUN`…`FascieDOM`. So `Updater.vba` gained `Rinomina_Moduli_Vendite` (Fase 0, before the downloads): it renames `FascieXXX` → `Lunedi`… via `vbComp.name`, falling back to `Properties("_CodeName")`, and never fails the update. Accents were dropped on purpose (`Lunedi`, not `Lunedì`): accented identifiers depend on the Windows codepage, and `ì` in the raw.githubusercontent URL is not encoded by the updater.
+- Deployed workbooks need **two opens**: the first gets the new Updater, the second renames the modules and downloads `Lunedi.vba` etc.
+- `gestionale.xlsm` shows as **deleted** in the working tree. This was not done by Claude: there is an untracked `gestionale.xls` dated 14 Oct. Ask the user and do not stage it. The repo's `.xlsm` should also get its CodeNames renamed by hand (VBE → Properties → (Name)) or by running the updater.
+
+**Untested risks:** renaming a document module's CodeName while the project is running (check that there is no "project reset" or lost state), and `FormulaLocal` on cells inside merged areas.
+
+**Next:**
+1. The user tests on a copy: point `UPDATE_BRANCH` at `feat/fogli-vendite` (revert before merging), open twice, check the VBE shows `Lunedi (Lunedì)` with the code, then paste a full page.
+2. Commit / PR only when the user asks.
+
+---
+Previous status (branch `merge/no-ui-alerts`, already merged to main):
 
 Last updated: 2026-10-14. All planned code work is done and merged into this branch. Nothing has been run in Excel yet. No PR exists and none must be opened until the owner says so.
 
