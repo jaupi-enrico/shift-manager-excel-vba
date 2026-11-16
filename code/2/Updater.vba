@@ -34,9 +34,6 @@ Sub AggiornaCodiceVBA()
     Set Http = CreateObject("MSXML2.XMLHTTP")
     tipo = Worksheets("Tabelle").Range("H9").Value
 
-    ' --- Fase 0: i moduli dei fogli vendite prendono il nome del foglio
-    Rinomina_Moduli_Vendite vbProj
-
     ' --- Fase 1: scarica e verifica tutti i moduli
     Fase = 1
     For Each vbComp In vbProj.VBComponents
@@ -182,33 +179,3 @@ Private Function Estensione_Modulo(ByVal tipoComp As Long) As String
         Case Else: Estensione_Modulo = ".cls" ' classi, fogli, ThisWorkbook
     End Select
 End Function
-
-' I fogli vendite Lunedì ... Domenica avevano come nome in codice FascieLUN ... FascieDOM.
-' Li rinomina come il foglio (senza accento: Lunedi, Martedi, ...) cosi' l'updater
-' scarica Lunedi.vba ecc. Non blocca mai l'aggiornamento: se un nome non si puo'
-' cambiare, quel modulo resta com'e'.
-Private Sub Rinomina_Moduli_Vendite(ByVal vbProj As Object)
-    Dim Vecchi As Variant, Nuovi As Variant
-    Dim i As Integer
-    Dim vbComp As Object
-
-    Vecchi = Array("FascieLUN", "FascieMAR", "FascieMER", "FascieGIO", "FascieVEN", "FascieSAB", "FascieDOM")
-    Nuovi = Array("Lunedi", "Martedi", "Mercoledi", "Giovedi", "Venerdi", "Sabato", "Domenica")
-
-    On Error Resume Next
-    For i = LBound(Vecchi) To UBound(Vecchi)
-        Set vbComp = Nothing
-        Set vbComp = vbProj.VBComponents(Vecchi(i))
-        If Not vbComp Is Nothing Then
-            Err.Clear
-            vbComp.name = Nuovi(i)
-            If Err.Number <> 0 Then
-                Err.Clear
-                vbComp.Properties("_CodeName").Value = Nuovi(i)
-            End If
-            If Err.Number <> 0 Then Debug.Print "Impossibile rinominare " & Vecchi(i)
-            Err.Clear
-        End If
-    Next i
-    On Error GoTo 0
-End Sub
